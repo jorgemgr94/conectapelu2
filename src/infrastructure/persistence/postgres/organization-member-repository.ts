@@ -51,7 +51,7 @@ function buildWhereConditions(filters?: OrganizationMemberFilters): SQL | undefi
  * Organization Member Repository implementation.
  * Extends base CRUD with organization-member-specific methods.
  */
-export const organizationMemberRepository: OrganizationMemberRepository = {
+export const postgresOrganizationMemberRepository: OrganizationMemberRepository = {
   ...baseRepository,
 
   // Override find to support filters

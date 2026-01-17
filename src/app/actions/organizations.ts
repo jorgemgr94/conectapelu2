@@ -12,6 +12,7 @@ import { getOrganizationRepository } from '@/infrastructure/persistence';
 import { createClient } from '@/lib/supabase/server';
 
 const repo = getOrganizationRepository();
+type CreateOrganizationInput = Pick<CreateOrganizationData, 'name' | 'slug' | 'description' | 'logo'>;
 
 /**
  * Get paginated organizations with optional filters.
@@ -31,7 +32,7 @@ export async function getOrganizationBySlug(slug: string) {
   return repo.findBySlug(slug);
 }
 
-export async function createOrganization(data: CreateOrganizationData) {
+export async function createOrganization(data: CreateOrganizationInput) {
   const supabase = await createClient();
   const {
     data: { user },

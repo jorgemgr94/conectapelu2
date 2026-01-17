@@ -1,5 +1,6 @@
 'use client';
 
+import type { User } from '@/domain/users';
 import { OrgHeader } from './header';
 import { OrgSidebar, OrgSidebarProvider, useOrgSidebar } from './sidebar';
 
@@ -9,7 +10,7 @@ function OrgContent({
   organizationName,
 }: {
   children: React.ReactNode;
-  user: { email?: string } | null;
+  user: User | null;
   organizationName: string;
 }) {
   const { collapsed } = useOrgSidebar();
@@ -35,7 +36,7 @@ export function OrgShell({
   organizationName,
 }: {
   children: React.ReactNode;
-  user: { email?: string } | null;
+  user: User | null;
   organizationSlug: string;
   organizationName: string;
 }) {

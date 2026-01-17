@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getOrganizationBySlug, getUserMembershipForOrg } from '@/app/actions/organization-members';
 import { OrgShell } from '@/components/org';
 import { createClient } from '@/lib/supabase/server';
+import { postgresUserRepository } from '@/infrastructure/persistence';
 
 interface OrgLayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,11 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
     redirect('/login');
   }
 
+  const dbUser = await postgresUserRepository.findById(user.id);
+  if (!dbUser) {
+    redirect('/login?error=user_not_found');
+  }
+
   // Get the organization by slug
   const organization = await getOrganizationBySlug(slug);
 
@@ -36,7 +42,7 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
   }
 
   return (
-    <OrgShell user={user} organizationSlug={slug} organizationName={organization.name}>
+    <OrgShell user={dbUser} organizationSlug={slug} organizationName={organization.name}>
       {children}
     </OrgShell>
   );

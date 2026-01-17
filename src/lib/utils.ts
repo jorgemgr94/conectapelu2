@@ -11,7 +11,11 @@ export function cn(...inputs: ClassValue[]) {
  * Returns the user's display name.
  * Priority: "FirstName LastName" > firstName > email prefix
  */
-export function getUserDisplayName(user: User): string {
+export function getUserDisplayName(user?: User | null): string {
+  if (!user) {
+    return 'Usuario';
+  }
+
   if (user.firstName && user.lastName) {
     return `${user.firstName} ${user.lastName}`;
   }
@@ -27,7 +31,11 @@ export function getUserDisplayName(user: User): string {
  * Returns the user's initials for avatars.
  * Priority: First letter of firstName > first letter of email
  */
-export function getUserInitials(user: User): string {
+export function getUserInitials(user?: User | null): string {
+  if (!user) {
+    return '?';
+  }
+
   if (user.firstName) {
     return user.firstName.charAt(0).toUpperCase();
   }

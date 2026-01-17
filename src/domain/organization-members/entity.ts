@@ -9,5 +9,5 @@ export interface OrganizationMemberWithOrg extends OrganizationMember {
   organization: Pick<Organization, 'id' | 'name' | 'slug' | 'status'>;
 }
 
-export type CreateOrganizationMemberData = typeof organizationMembersTable.$inferInsert;
+export type CreateOrganizationMemberData = Omit<typeof organizationMembersTable.$inferInsert, 'id'>;
 export type UpdateOrganizationMemberData = Partial<CreateOrganizationMemberData>;

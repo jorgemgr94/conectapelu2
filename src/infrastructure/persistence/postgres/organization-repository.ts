@@ -53,7 +53,7 @@ function buildWhereConditions(filters?: OrganizationFilters): SQL | undefined {
 }
 
 // Extend with organization-specific methods
-export const organizationRepository: OrganizationRepository = {
+export const postgresOrganizationRepository: OrganizationRepository = {
   ...baseRepository,
 
   // Override find to support filters

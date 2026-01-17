@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { UserShell } from '@/components/user';
 import { createClient } from '@/lib/supabase/server';
+import { postgresUserRepository } from '@/infrastructure/persistence';
 
 export default async function UserLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -25,5 +26,10 @@ export default async function UserLayout({ children }: { children: React.ReactNo
     redirect(loginUrl);
   }
 
-  return <UserShell user={user}>{children}</UserShell>;
+  const dbUser = await postgresUserRepository.findById(user.id);
+  if (!dbUser) {
+    redirect('/login?error=user_not_found');
+  }
+
+  return <UserShell user={dbUser}>{children}</UserShell>;
 }

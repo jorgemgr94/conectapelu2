@@ -1,5 +1,6 @@
 'use client';
 
+import type { User } from '@/domain/users';
 import { UserHeader } from './header';
 import { UserSidebar, UserSidebarProvider, useUserSidebar } from './sidebar';
 
@@ -8,7 +9,7 @@ function UserContent({
   user,
 }: {
   children: React.ReactNode;
-  user: { email?: string } | null;
+  user: User;
 }) {
   const { collapsed } = useUserSidebar();
 
@@ -31,7 +32,7 @@ export function UserShell({
   user,
 }: {
   children: React.ReactNode;
-  user: { email?: string } | null;
+  user: User;
 }) {
   return (
     <UserSidebarProvider>
