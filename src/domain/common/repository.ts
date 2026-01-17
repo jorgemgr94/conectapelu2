@@ -8,10 +8,19 @@ export interface BaseEntity {
   id: string;
 }
 
+// ============================================================================
+// Query Options & Results
+// ============================================================================
+
 // Pagination options
 export interface PaginationOptions {
   page?: number;
   limit?: number;
+}
+
+// Query options with optional filters
+export interface QueryOptions<TFilters = never> extends PaginationOptions {
+  filters?: TFilters;
 }
 
 // Default pagination values
@@ -19,33 +28,40 @@ export const DEFAULT_PAGE = 1;
 export const DEFAULT_LIMIT = 20;
 export const MAX_LIMIT = 100;
 
-// Paginated response
-export interface PaginatedResult<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  };
+// Pagination metadata
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
 }
 
+// Paginated result
+export interface PaginatedResult<T> {
+  data: T[];
+  pagination: PaginationMeta;
+}
+
+// ============================================================================
+// Base CRUD Repository
+// ============================================================================
+
 /**
- * Base CRUD Repository interface with pagination.
- * All findAll queries are bounded by default.
+ * Base CRUD Repository interface with pagination support.
  *
  * @template T - The entity type
  * @template CreateDTO - Data required to create an entity
  * @template UpdateDTO - Data that can be updated on an entity
+ * @template TFilters - Optional filter type for queries (defaults to never = no filters)
  */
-export interface CrudRepository<T extends BaseEntity, CreateDTO, UpdateDTO> {
+export interface CrudRepository<T extends BaseEntity, CreateDTO, UpdateDTO, TFilters = never> {
   /**
-   * Find all entities with pagination (bounded query).
-   * @param options - Pagination options (defaults: page=1, limit=20)
+   * Find entities with pagination and optional filters.
+   * @param options - Pagination and filter options
    */
-  findAll(options?: PaginationOptions): Promise<PaginatedResult<T>>;
+  find(options?: QueryOptions<TFilters>): Promise<PaginatedResult<T>>;
 
   findById(id: string): Promise<T | null>;
   create(data: CreateDTO): Promise<T>;
@@ -53,13 +69,17 @@ export interface CrudRepository<T extends BaseEntity, CreateDTO, UpdateDTO> {
   delete(id: string): Promise<boolean>;
 
   /**
-   * Count total entities (for pagination).
+   * Count total entities (optionally with filters).
    */
-  count(): Promise<number>;
+  count(filters?: TFilters): Promise<number>;
 }
 
+// ============================================================================
+// Helper functions
+// ============================================================================
+
 /**
- * Helper to normalize pagination options.
+ * Normalize pagination options with defaults and bounds.
  */
 export function normalizePagination(options?: PaginationOptions): Required<PaginationOptions> {
   const page = Math.max(1, options?.page ?? DEFAULT_PAGE);
@@ -68,12 +88,12 @@ export function normalizePagination(options?: PaginationOptions): Required<Pagin
 }
 
 /**
- * Helper to build pagination metadata.
+ * Build pagination metadata from total count and normalized options.
  */
 export function buildPaginationMeta(
   total: number,
   options: Required<PaginationOptions>,
-): PaginatedResult<never>['pagination'] {
+): PaginationMeta {
   const totalPages = Math.ceil(total / options.limit);
   return {
     page: options.page,
