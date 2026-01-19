@@ -1,6 +1,6 @@
 'use client';
 
-import type { User } from '@/domain/users';
+import type { User } from '@/app/actions/users';
 import { OrgHeader } from './header';
 import { OrgSidebar, OrgSidebarProvider, useOrgSidebar } from './sidebar';
 

@@ -3,14 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PublicFooter, PublicHeader } from '@/components/public';
 import { Button } from '@/components/ui/button';
-import { calculatePetAge } from '@/domain/pets';
-import { getPetRepository } from '@/infrastructure/persistence';
+import { getRandomPets, getPetsCount } from '@/app/actions/pets';
+import { calculatePetAge } from '@/lib/pets';
 
 export default async function HomePage() {
-  const repository = getPetRepository();
   const [featuredPets, totalCount] = await Promise.all([
-    repository.getRandomPets(6),
-    repository.count(),
+    getRandomPets(6),
+    getPetsCount(),
   ]);
 
   return (

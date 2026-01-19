@@ -1,6 +1,6 @@
 'use client';
 
-import type { User } from '@/domain/users';
+import type { User } from '@/app/actions/users';
 import { UserHeader } from './header';
 import { UserSidebar, UserSidebarProvider, useUserSidebar } from './sidebar';
 

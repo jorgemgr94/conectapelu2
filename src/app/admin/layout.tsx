@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import { AdminShell } from '@/components/admin';
-import { postgresUserRepository } from '@/infrastructure/persistence';
+import { db } from '@/db';
+import { usersTable } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -13,7 +15,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect('/login');
   }
 
-  const dbUser = await postgresUserRepository.findById(authUser.id);
+  const dbUser = await db.query.usersTable.findFirst({
+        where: eq(usersTable.id, authUser.id)
+  });
   if (!dbUser) {
     redirect('/login');
   }

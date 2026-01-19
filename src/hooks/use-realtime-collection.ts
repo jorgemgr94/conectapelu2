@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { PaginatedResult } from '@/domain/common';
+import type { PaginatedResult } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 
 interface UseRealtimeCollectionOptions<T> {

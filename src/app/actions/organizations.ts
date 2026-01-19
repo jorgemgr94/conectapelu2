@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '@/db';
 import { organizationsTable } from '@/db/schema';
-import type { PaginatedResult, QueryOptions } from '@/domain/common';
+import type { PaginatedResult, QueryOptions } from '@/lib/types';
 import { createClient } from '@/lib/supabase/server';
 
 export type Organization = typeof organizationsTable.$inferSelect;

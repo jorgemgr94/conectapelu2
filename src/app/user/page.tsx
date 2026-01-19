@@ -3,8 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { CollapsibleSection, PetActionModal } from '@/components/user';
-import { calculatePetAge, getSpeciesLabel } from '@/domain/pets';
-import { getPetRepository } from '@/infrastructure/persistence';
+import { calculatePetAge, getSpeciesLabel } from '@/lib/pets';
+import { getPet, getRandomPets, Pet } from '@/app/actions/pets';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function UserDashboardPage({
@@ -18,16 +18,14 @@ export default async function UserDashboardPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const repository = getPetRepository();
-
   let modalPet = null;
   if (params.petId) {
-    modalPet = await repository.findById(params.petId);
+    modalPet = await getPet(params.petId);
   }
 
-  const adoptedPets: Awaited<ReturnType<typeof repository.getRandomPets>> = [];
-  const sponsoredPets = await repository.getRandomPets(2);
-  const favoritePets = await repository.getRandomPets(4);
+  const adoptedPets: Pet[] = [];
+  const sponsoredPets = await getRandomPets(2);
+  const favoritePets = await getRandomPets(4);
   const requests: Array<{
     id: string;
     petName: string;
@@ -233,11 +231,7 @@ function PetCard({
   sponsored = false,
   compact = false,
 }: {
-  pet: Awaited<ReturnType<typeof getPetRepository>>['findById'] extends (
-    id: string,
-  ) => Promise<infer T>
-    ? NonNullable<T>
-    : never;
+  pet: Pet;
   sponsored?: boolean;
   compact?: boolean;
 }) {

@@ -16,19 +16,18 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PublicFooter, PublicHeader } from '@/components/public';
 import { Button } from '@/components/ui/button';
-import { calculatePetAge, getSexLabel, getSizeLabel, getSpeciesLabel } from '@/domain/pets';
-import { getPetRepository } from '@/infrastructure/persistence';
+import { calculatePetAge, getSexLabel, getSizeLabel, getSpeciesLabel } from '@/lib/pets';
+import { getPet, getRandomPets } from '@/app/actions/pets';
 
 export default async function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const repository = getPetRepository();
-  const pet = await repository.findById(id);
+  const pet = await getPet(id);
 
   if (!pet) {
     notFound();
   }
 
-  const similarPets = await repository.getRandomPets(4, { species: pet.species });
+  const similarPets = await getRandomPets(4, { species: pet.species });
   const filteredSimilarPets = similarPets.filter((p) => p.id !== pet.id).slice(0, 3);
 
   const petAge = calculatePetAge(pet.birthDate);

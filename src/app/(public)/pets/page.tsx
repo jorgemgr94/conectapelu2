@@ -21,8 +21,8 @@ import {
   type PetFilters,
   type PetSize,
   type PetSpecies,
-} from '@/domain/pets';
-import { getPetRepository } from '@/infrastructure/persistence';
+} from '@/lib/pets';
+import { getAvailableCities, getCountsBySpecies, getPets, getPetsCount } from '@/app/actions/pets';
 
 interface PetsPageProps {
   searchParams: Promise<{
@@ -36,7 +36,6 @@ interface PetsPageProps {
 
 export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
   const params = await searchParams;
-  const repository = getPetRepository();
 
   const filters: PetFilters = {};
   if (params.type && ['dog', 'cat'].includes(params.type)) {
@@ -56,9 +55,9 @@ export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
   const pageSize = 10;
 
   const [petsResult, speciesCounts, availableCities] = await Promise.all([
-    repository.find({ page: currentPage, limit: pageSize, filters }),
-    repository.getCountsBySpecies(),
-    repository.getAvailableCities(),
+    getPets({ page: currentPage, limit: pageSize, filters }),
+    getCountsBySpecies(),
+    getAvailableCities(),
   ]);
 
   const { data: pets, pagination } = petsResult;

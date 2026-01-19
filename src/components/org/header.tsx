@@ -1,6 +1,6 @@
 import { Bell, Command, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { User } from '@/domain/users';
+import type { User } from '@/app/actions/users';
 import { getUserDisplayName, getUserInitials } from '@/lib/utils';
 
 interface HeaderProps {

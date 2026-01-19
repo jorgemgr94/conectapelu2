@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { Organization } from '@/app/actions/organizations';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
-import type { PaginatedResult } from '@/domain/common';
+import type { PaginatedResult } from '@/lib/types';
 
 interface OrganizationsGridProps {
   data: PaginatedResult<Organization>;

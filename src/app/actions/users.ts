@@ -2,11 +2,19 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
-import type { PaginatedResult, PaginationOptions } from '@/domain/common';
-import type { CreateUserData, UpdateUserData, User } from '@/domain/users';
-import { postgresUserRepository } from '@/infrastructure/persistence';
+import { count, desc, eq, ilike, or, type SQL, and } from 'drizzle-orm';
+import { db } from '@/db';
+import { usersTable } from '@/db/schema';
+import type { PaginatedResult, QueryOptions } from '@/lib/types';
 
-const repository = postgresUserRepository;
+export type User = typeof usersTable.$inferSelect;
+export type NewUser = typeof usersTable.$inferInsert;
+
+export interface UserFilters {
+  search?: string;
+  role?: User['role'];
+  status?: User['status'];
+}
 
 // Admin Supabase client for user management
 function getAdminClient() {
@@ -17,12 +25,60 @@ function getAdminClient() {
   );
 }
 
-export async function getUsers(options?: PaginationOptions): Promise<PaginatedResult<User>> {
-  return repository.find(options);
+export async function getUsers(
+  options?: QueryOptions<UserFilters>
+): Promise<PaginatedResult<User>> {
+  const page = options?.page ?? 1;
+  const pageSize = options?.limit ?? 10;
+  const { search, role, status } = options?.filters ?? {};
+
+  const whereConditions: SQL[] = [];
+
+  if (role) whereConditions.push(eq(usersTable.role, role));
+  if (status) whereConditions.push(eq(usersTable.status, status));
+
+  if (search) {
+    const searchLower = `%${search.toLowerCase()}%`;
+    whereConditions.push(
+      or(
+        ilike(usersTable.email, searchLower),
+        ilike(usersTable.firstName, searchLower),
+        ilike(usersTable.lastName, searchLower)
+      ) as SQL
+    );
+  }
+
+  const where = whereConditions.length > 0 ? and(...whereConditions) : undefined;
+
+  const [totalResult] = await db.select({ count: count() }).from(usersTable).where(where);
+  const total = totalResult?.count ?? 0;
+  const totalPages = Math.ceil(total / pageSize);
+
+  const data = await db.query.usersTable.findMany({
+    where,
+    orderBy: [desc(usersTable.createdAt)],
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+  });
+
+  return {
+    data,
+    pagination: {
+      page,
+      limit: pageSize,
+      total,
+      totalPages,
+      hasPrev: page > 1,
+      hasNext: page < totalPages,
+    },
+  };
 }
 
 export async function getUser(id: string): Promise<User | null> {
-  return repository.findById(id);
+  const user = await db.query.usersTable.findFirst({
+    where: eq(usersTable.id, id),
+  });
+  return user ?? null;
 }
 
 export async function createUser(data: {
@@ -54,48 +110,71 @@ export async function createUser(data: {
     }
 
     // Create user in our database
-    const userData: CreateUserData = {
-      id: authData.user.id,
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      phone: data.phone,
-      address: data.address,
-      avatar: data.avatar,
-      role: data.role ?? 'user',
-      status: 'active',
-    };
+    const [user] = await db
+      .insert(usersTable)
+      .values({
+        id: authData.user.id,
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+        address: data.address,
+        avatar: data.avatar,
+        role: data.role ?? 'user',
+        status: 'active',
+      })
+      .returning();
 
-    const user = await repository.create(userData);
     revalidatePath('/admin/users');
 
     return { success: true, user };
   } catch (error) {
     console.error('Error creating user:', error);
+    // Try to rollback auth user if db creation fails? 
+    // Ideally yes, but keeping it simple as per original implementation for now.
     return { success: false, error: 'Error interno al crear usuario' };
   }
 }
 
-export async function updateUser(id: string, data: UpdateUserData): Promise<User | null> {
-  const user = await repository.update(id, data);
+export async function updateUser(id: string, data: Partial<User>): Promise<User | null> {
+  const [user] = await db
+    .update(usersTable)
+    .set({
+      ...data,
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(usersTable.id, id))
+    .returning();
+
   if (user) {
     revalidatePath('/admin/users');
   }
-  return user;
+  return user ?? null;
 }
 
 export async function deactivateUser(id: string): Promise<boolean> {
-  const result = await repository.delete(id); // Soft delete
-  if (result) {
+  const result = await db
+    .update(usersTable)
+    .set({ status: 'inactive', updatedAt: new Date().toISOString() })
+    .where(eq(usersTable.id, id))
+    .returning();
+
+  if (result.length > 0) {
     revalidatePath('/admin/users');
+    return true;
   }
-  return result;
+  return false;
 }
 
 export async function reactivateUser(id: string): Promise<User | null> {
-  const user = await repository.update(id, { status: 'active' });
+  const [user] = await db
+    .update(usersTable)
+    .set({ status: 'active', updatedAt: new Date().toISOString() })
+    .where(eq(usersTable.id, id))
+    .returning();
+
   if (user) {
     revalidatePath('/admin/users');
   }
-  return user;
+  return user ?? null;
 }

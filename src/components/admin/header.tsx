@@ -1,7 +1,7 @@
 import { Bell, Command, Search } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import type { User } from '@/domain/users';
+import type { User } from '@/app/actions/users';
 import { getUserDisplayName, getUserInitials } from '@/lib/utils';
 
 export function Header({ user }: { user: User }) {

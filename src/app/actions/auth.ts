@@ -1,7 +1,6 @@
 'use server';
 
-import {
-} from '@/infrastructure/persistence';
+
 import { db } from '@/db';
 import { usersTable, organizationMembersTable, organizationsTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';

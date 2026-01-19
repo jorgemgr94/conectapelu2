@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { calculatePetAge, getSpeciesLabel, type Pet } from '@/domain/pets';
+import { calculatePetAge, getSpeciesLabel } from '@/lib/pets';
+import { type Pet } from '@/app/actions/pets';
 
 export function PetActionModal({ pet }: { pet: Pet | null }) {
   const router = useRouter();

@@ -1,17 +1,20 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import { db } from '@/db';
 import { organizationMembersTable, organizationsTable, usersTable } from '@/db/schema';
-import type { OrganizationMemberWithOrg } from '@/domain/organization-members';
-import {
-  postgresOrganizationMemberRepository,
-} from '@/infrastructure/persistence';
 
-const memberRepository = postgresOrganizationMemberRepository;
+export type OrganizationMember = typeof organizationMembersTable.$inferSelect;
+export type OrganizationMemberWithOrg = OrganizationMember & {
+  organization: {
+    id: string;
+    name: string;
+    slug: string;
+    status: string;
+  };
+};
 
 export async function getUserMemberships(userId: string): Promise<OrganizationMemberWithOrg[]> {
-  // Get memberships
   // Get memberships
   const memberships = await db.query.organizationMembersTable.findMany({
     where: eq(organizationMembersTable.userId, userId),
@@ -47,16 +50,20 @@ export async function getOrganizationBySlug(slug: string) {
 }
 
 export async function getOrganizationMembers(organizationId: string) {
-  const { data } = await memberRepository.find({ filters: { organizationId } });
-  return data;
+  return await db.query.organizationMembersTable.findMany({
+    where: eq(organizationMembersTable.organizationId, organizationId),
+    orderBy: [desc(organizationMembersTable.createdAt)],
+  });
 }
 
 export async function getUserMembershipForOrg(userId: string, organizationId: string) {
-  const { data } = await memberRepository.find({
-    filters: { userId, organizationId },
-    limit: 1,
+  const member = await db.query.organizationMembersTable.findFirst({
+    where: and(
+      eq(organizationMembersTable.userId, userId),
+      eq(organizationMembersTable.organizationId, organizationId)
+    ),
   });
-  return data[0] ?? null;
+  return member ?? null;
 }
 
 export async function getOrganizationMembersBySlug(slug: string) {
