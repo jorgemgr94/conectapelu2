@@ -4,13 +4,7 @@ import type { User } from '@/domain/users';
 import { Header } from './header';
 import { Sidebar, SidebarProvider, useSidebar } from './sidebar';
 
-function AdminContent({
-  children,
-  user,
-}: {
-  children: React.ReactNode;
-  user: User;
-}) {
+function AdminContent({ children, user }: { children: React.ReactNode; user: User }) {
   const { collapsed } = useSidebar();
 
   return (
@@ -27,13 +21,7 @@ function AdminContent({
   );
 }
 
-export function AdminShell({
-  children,
-  user,
-}: {
-  children: React.ReactNode;
-  user: User;
-}) {
+export function AdminShell({ children, user }: { children: React.ReactNode; user: User }) {
   return (
     <SidebarProvider>
       <AdminContent user={user}>{children}</AdminContent>

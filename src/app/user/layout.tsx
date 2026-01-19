@@ -1,8 +1,8 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { UserShell } from '@/components/user';
-import { createClient } from '@/lib/supabase/server';
 import { postgresUserRepository } from '@/infrastructure/persistence';
+import { createClient } from '@/lib/supabase/server';
 
 export default async function UserLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();

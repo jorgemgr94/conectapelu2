@@ -6,21 +6,27 @@ import { organizationMembersTable, organizationsTable, usersTable } from '@/db/s
 import type { OrganizationMemberWithOrg } from '@/domain/organization-members';
 import {
   postgresOrganizationMemberRepository,
-  postgresOrganizationRepository,
 } from '@/infrastructure/persistence';
 
 const memberRepository = postgresOrganizationMemberRepository;
-const orgRepository = postgresOrganizationRepository;
 
 export async function getUserMemberships(userId: string): Promise<OrganizationMemberWithOrg[]> {
   // Get memberships
-  const { data: memberships } = await memberRepository.find({ filters: { userId } });
+  // Get memberships
+  const memberships = await db.query.organizationMembersTable.findMany({
+    where: eq(organizationMembersTable.userId, userId),
+  });
+
   if (memberships.length === 0) return [];
 
   // Get organizations for those memberships
   const orgIds = [...new Set(memberships.map((m) => m.organizationId))];
-  const orgs = await Promise.all(orgIds.map((id) => orgRepository.findById(id)));
-  const orgMap = new Map(orgs.filter(Boolean).map((o) => [o!.id, o!]));
+  // Fetch orgs in a single query
+  const orgs = await db.query.organizationsTable.findMany({
+    where: (t, { inArray }) => inArray(t.id, orgIds)
+  });
+
+  const orgMap = new Map(orgs.map((o) => [o.id, o]));
 
   // Combine
   return memberships.map((m) => ({
@@ -35,7 +41,9 @@ export async function getUserMemberships(userId: string): Promise<OrganizationMe
 }
 
 export async function getOrganizationBySlug(slug: string) {
-  return orgRepository.findBySlug(slug);
+  return await db.query.organizationsTable.findFirst({
+    where: eq(organizationsTable.slug, slug)
+  });
 }
 
 export async function getOrganizationMembers(organizationId: string) {
@@ -53,7 +61,9 @@ export async function getUserMembershipForOrg(userId: string, organizationId: st
 
 export async function getOrganizationMembersBySlug(slug: string) {
   // First get the organization
-  const org = await orgRepository.findBySlug(slug);
+  const org = await db.query.organizationsTable.findFirst({
+    where: eq(organizationsTable.slug, slug)
+  });
   if (!org) return [];
 
   // Get members with user details

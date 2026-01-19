@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 import { getOrganizationBySlug, getUserMembershipForOrg } from '@/app/actions/organization-members';
 import { OrgShell } from '@/components/org';
-import { createClient } from '@/lib/supabase/server';
 import { postgresUserRepository } from '@/infrastructure/persistence';
+import { createClient } from '@/lib/supabase/server';
 
 interface OrgLayoutProps {
   children: React.ReactNode;

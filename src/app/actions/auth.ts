@@ -1,10 +1,10 @@
 'use server';
 
 import {
-  postgresOrganizationMemberRepository,
-  postgresOrganizationRepository,
-  postgresUserRepository,
 } from '@/infrastructure/persistence';
+import { db } from '@/db';
+import { usersTable, organizationMembersTable, organizationsTable } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -25,7 +25,10 @@ export async function getLoginRedirectPath(): Promise<string> {
     console.log('[Auth] User authenticated:', user.id);
 
     // Get user from our database
-    const dbUser = await postgresUserRepository.findById(user.id);
+    const dbUser = await db.query.usersTable.findFirst({
+      where: eq(usersTable.id, user.id)
+    });
+
     if (!dbUser) {
       // User exists in auth but not in our users table
       console.log('[Auth] User not found in database:', user.id);
@@ -40,8 +43,8 @@ export async function getLoginRedirectPath(): Promise<string> {
     }
 
     // Check if user has organization memberships
-    const { data: memberships } = await postgresOrganizationMemberRepository.find({
-      filters: { userId: user.id },
+    const memberships = await db.query.organizationMembersTable.findMany({
+      where: eq(organizationMembersTable.userId, user.id),
       limit: 1,
     });
 
@@ -49,7 +52,9 @@ export async function getLoginRedirectPath(): Promise<string> {
 
     if (memberships.length > 0) {
       // Get the first organization
-      const org = await postgresOrganizationRepository.findById(memberships[0].organizationId);
+      const org = await db.query.organizationsTable.findFirst({
+        where: eq(organizationsTable.id, memberships[0].organizationId),
+      });
       if (org) {
         return `/org/${org.slug}/dashboard`;
       }

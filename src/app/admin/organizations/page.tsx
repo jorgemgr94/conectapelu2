@@ -1,10 +1,9 @@
 import { Building2, Filter, Plus, Search } from 'lucide-react';
 import Link from 'next/link';
-
+import type { Organization } from '@/app/actions/organizations';
 import { getOrganizations } from '@/app/actions/organizations';
 import { OrganizationsGrid } from '@/components/admin';
 import { Button } from '@/components/ui/button';
-import type { Organization } from '@/domain/organizations';
 
 const ITEMS_PER_PAGE = 12;
 

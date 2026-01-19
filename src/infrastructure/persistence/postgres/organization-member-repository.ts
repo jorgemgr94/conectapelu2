@@ -1,4 +1,4 @@
-import { and, count as drizzleCount, desc, eq, type SQL } from 'drizzle-orm';
+import { and, desc, count as drizzleCount, eq, type SQL } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { organizationMembersTable } from '@/db/schema';

@@ -4,13 +4,7 @@ import type { User } from '@/domain/users';
 import { UserHeader } from './header';
 import { UserSidebar, UserSidebarProvider, useUserSidebar } from './sidebar';
 
-function UserContent({
-  children,
-  user,
-}: {
-  children: React.ReactNode;
-  user: User;
-}) {
+function UserContent({ children, user }: { children: React.ReactNode; user: User }) {
   const { collapsed } = useUserSidebar();
 
   return (
@@ -27,13 +21,7 @@ function UserContent({
   );
 }
 
-export function UserShell({
-  children,
-  user,
-}: {
-  children: React.ReactNode;
-  user: User;
-}) {
+export function UserShell({ children, user }: { children: React.ReactNode; user: User }) {
   return (
     <UserSidebarProvider>
       <UserContent user={user}>{children}</UserContent>

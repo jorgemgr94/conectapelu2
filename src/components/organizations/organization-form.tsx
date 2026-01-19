@@ -5,6 +5,7 @@ import { type Static, Type } from '@sinclair/typebox';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import type { Organization } from '@/app/actions/organizations';
 import { createOrganization, updateOrganization } from '@/app/actions/organizations';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +18,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import type { Organization } from '@/domain/organizations';
 
 // Form validation schema
 const formSchema = Type.Object({

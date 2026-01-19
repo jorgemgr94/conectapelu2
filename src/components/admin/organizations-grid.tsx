@@ -1,10 +1,9 @@
 import { Building2, Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-
+import type { Organization } from '@/app/actions/organizations';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import type { PaginatedResult } from '@/domain/common';
-import type { Organization } from '@/domain/organizations';
 
 interface OrganizationsGridProps {
   data: PaginatedResult<Organization>;
@@ -25,9 +24,7 @@ export function OrganizationsGrid({ data, hasFilters = false }: OrganizationsGri
           No se encontraron organizaciones
         </h3>
         <p className="mt-1 text-sm text-neutral-500">
-          {hasFilters
-            ? 'Intenta ajustar los filtros'
-            : 'Comienza creando tu primera organización'}
+          {hasFilters ? 'Intenta ajustar los filtros' : 'Comienza creando tu primera organización'}
         </p>
         {!hasFilters && (
           <Button asChild className="mt-4" variant="outline">
