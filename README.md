@@ -89,12 +89,11 @@ URL for application traffic; keep the distinction explicit in deployment configu
 
 ## Documentation
 
-- [Project analysis and delivery roadmap](docs/project-analysis.md)
 - [CRUD scaffolding guide](docs/crud-scaffolding.md)
 - [Contribution guide](CONTRIBUTING.md)
 
-The current CRUD guide predates recent direct-Drizzle refactors. PR-05 in the delivery roadmap
-will replace it with the implemented reference CRUD pattern.
+The current CRUD guide predates recent direct-Drizzle refactors and should be updated alongside
+the first reference CRUD implementation.
 
 ## Pull requests
 
