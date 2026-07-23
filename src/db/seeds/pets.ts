@@ -5,7 +5,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { db, getRandomElement, nowISO, schema, type SeedResult } from './config';
+import { db, getRandomElement, nowISO, type SeedResult, schema } from './config';
 import { getAdminUserId } from './users';
 
 // =============================================================================
@@ -129,8 +129,8 @@ const CAT_IMAGES = [
   'https://images.unsplash.com/photo-1513245543132-31f507417b26?w=800&q=80',
 ];
 
-const SIZES = ['small', 'medium', 'large'];
-const SEXES = ['male', 'female'];
+const SIZES = ['small', 'medium', 'large'] as const;
+const SEXES = ['male', 'female'] as const;
 
 // =============================================================================
 // Helper functions
@@ -199,7 +199,7 @@ export async function seedPets(options: SeedPetsOptions): Promise<SeedResult> {
   let catIndex = 0;
 
   for (let i = 0; i < toCreate; i++) {
-    const species = i % 3 !== 0 ? 'dog' : 'cat'; // ~66% dogs
+    const species: 'dog' | 'cat' = i % 3 !== 0 ? 'dog' : 'cat'; // ~66% dogs
     const sex = getRandomElement(SEXES);
     const size = getRandomElement(SIZES);
     const cityId = cityIds[i % cityIds.length];

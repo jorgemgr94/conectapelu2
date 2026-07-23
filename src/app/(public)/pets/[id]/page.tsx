@@ -14,10 +14,10 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getPet, getRandomPets } from '@/app/actions/pets';
 import { PublicFooter, PublicHeader } from '@/components/public';
 import { Button } from '@/components/ui/button';
 import { calculatePetAge, getSexLabel, getSizeLabel, getSpeciesLabel } from '@/lib/pets';
-import { getPet, getRandomPets } from '@/app/actions/pets';
 
 export default async function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

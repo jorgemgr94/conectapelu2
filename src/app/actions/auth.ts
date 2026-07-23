@@ -1,9 +1,8 @@
 'use server';
 
-
-import { db } from '@/db';
-import { usersTable, organizationMembersTable, organizationsTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { db } from '@/db';
+import { organizationMembersTable, organizationsTable, usersTable } from '@/db/schema';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -25,7 +24,7 @@ export async function getLoginRedirectPath(): Promise<string> {
 
     // Get user from our database
     const dbUser = await db.query.usersTable.findFirst({
-      where: eq(usersTable.id, user.id)
+      where: eq(usersTable.id, user.id),
     });
 
     if (!dbUser) {

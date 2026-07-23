@@ -2,9 +2,9 @@ import { Heart, PawPrint, ScrollText, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { getPet, getRandomPets, type Pet } from '@/app/actions/pets';
 import { CollapsibleSection, PetActionModal } from '@/components/user';
 import { calculatePetAge, getSpeciesLabel } from '@/lib/pets';
-import { getPet, getRandomPets, Pet } from '@/app/actions/pets';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function UserDashboardPage({

@@ -1,16 +1,13 @@
 import { ArrowRight, Building2, Cat, Dog, Heart, PawPrint, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getPetsCount, getRandomPets } from '@/app/actions/pets';
 import { PublicFooter, PublicHeader } from '@/components/public';
 import { Button } from '@/components/ui/button';
-import { getRandomPets, getPetsCount } from '@/app/actions/pets';
 import { calculatePetAge } from '@/lib/pets';
 
 export default async function HomePage() {
-  const [featuredPets, totalCount] = await Promise.all([
-    getRandomPets(6),
-    getPetsCount(),
-  ]);
+  const [featuredPets, totalCount] = await Promise.all([getRandomPets(6), getPetsCount()]);
 
   return (
     <div className="min-h-screen bg-gradient-dark-page">

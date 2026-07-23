@@ -1,9 +1,9 @@
+import { eq } from 'drizzle-orm';
 import { notFound, redirect } from 'next/navigation';
 import { getOrganizationBySlug, getUserMembershipForOrg } from '@/app/actions/organization-members';
 import { OrgShell } from '@/components/org';
 import { db } from '@/db';
 import { usersTable } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 import { createClient } from '@/lib/supabase/server';
 
 interface OrgLayoutProps {
@@ -24,7 +24,7 @@ export default async function OrgLayout({ children, params }: OrgLayoutProps) {
   }
 
   const dbUser = await db.query.usersTable.findFirst({
-      where: eq(usersTable.id, user.id)
+    where: eq(usersTable.id, user.id),
   });
   if (!dbUser) {
     redirect('/login?error=user_not_found');
