@@ -1,6 +1,6 @@
-# ConectaPelu
+# ConectaPelu2
 
-ConectaPelu is a Next.js and Supabase monolith for connecting rescue organizations, pets, and
+ConectaPelu2 is a Next.js and Supabase monolith for connecting rescue organizations, pets, and
 adopters. It is also a learning project for current full-stack patterns in Next.js, React,
 PostgreSQL, Drizzle, and Supabase.
 

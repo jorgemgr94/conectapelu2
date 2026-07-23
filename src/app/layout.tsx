@@ -8,7 +8,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'ConectaPelu - Pet Adoption Platform',
+  title: 'ConectaPelu2 - Pet Adoption Platform',
   description: 'Connect rescue organizations with pet adopters',
 };
 

@@ -1,4 +1,4 @@
-# Contributing to ConectaPelu
+# Contributing to ConectaPelu2
 
 This repository is a Next.js and Supabase modular monolith. Changes should preserve development
 speed while keeping authorization, tenant isolation, runtime validation, and database behavior
