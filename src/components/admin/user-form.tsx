@@ -5,11 +5,11 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import type { User as UserType } from '@/app/actions/users';
 import { createUser, updateUser } from '@/app/actions/users';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { User as UserType } from '@/app/actions/users';
 import { createClient } from '@/lib/supabase/client';
 
 export function UserForm({ user }: { user?: UserType }) {

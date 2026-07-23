@@ -6,7 +6,7 @@
 import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { db, schema, type SeedResult } from './config';
+import { db, type SeedResult, schema } from './config';
 
 // =============================================================================
 // Seed data

@@ -1,6 +1,6 @@
 'use server';
 
-import { eq, and, desc } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { organizationMembersTable, organizationsTable, usersTable } from '@/db/schema';
 
@@ -26,7 +26,7 @@ export async function getUserMemberships(userId: string): Promise<OrganizationMe
   const orgIds = [...new Set(memberships.map((m) => m.organizationId))];
   // Fetch orgs in a single query
   const orgs = await db.query.organizationsTable.findMany({
-    where: (t, { inArray }) => inArray(t.id, orgIds)
+    where: (t, { inArray }) => inArray(t.id, orgIds),
   });
 
   const orgMap = new Map(orgs.map((o) => [o.id, o]));
@@ -45,7 +45,7 @@ export async function getUserMemberships(userId: string): Promise<OrganizationMe
 
 export async function getOrganizationBySlug(slug: string) {
   return await db.query.organizationsTable.findFirst({
-    where: eq(organizationsTable.slug, slug)
+    where: eq(organizationsTable.slug, slug),
   });
 }
 
@@ -60,7 +60,7 @@ export async function getUserMembershipForOrg(userId: string, organizationId: st
   const member = await db.query.organizationMembersTable.findFirst({
     where: and(
       eq(organizationMembersTable.userId, userId),
-      eq(organizationMembersTable.organizationId, organizationId)
+      eq(organizationMembersTable.organizationId, organizationId),
     ),
   });
   return member ?? null;
@@ -69,7 +69,7 @@ export async function getUserMembershipForOrg(userId: string, organizationId: st
 export async function getOrganizationMembersBySlug(slug: string) {
   // First get the organization
   const org = await db.query.organizationsTable.findFirst({
-    where: eq(organizationsTable.slug, slug)
+    where: eq(organizationsTable.slug, slug),
   });
   if (!org) return [];
 

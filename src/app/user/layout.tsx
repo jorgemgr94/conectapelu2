@@ -1,9 +1,9 @@
+import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { UserShell } from '@/components/user';
 import { db } from '@/db';
 import { usersTable } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function UserLayout({ children }: { children: React.ReactNode }) {
@@ -29,7 +29,7 @@ export default async function UserLayout({ children }: { children: React.ReactNo
   }
 
   const dbUser = await db.query.usersTable.findFirst({
-      where: eq(usersTable.id, user.id)
+    where: eq(usersTable.id, user.id),
   });
   if (!dbUser) {
     redirect('/login?error=user_not_found');

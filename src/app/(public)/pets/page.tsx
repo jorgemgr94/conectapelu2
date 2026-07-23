@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getAvailableCities, getCountsBySpecies, getPets } from '@/app/actions/pets';
 import { PublicFooter, PublicHeader } from '@/components/public';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +23,6 @@ import {
   type PetSize,
   type PetSpecies,
 } from '@/lib/pets';
-import { getAvailableCities, getCountsBySpecies, getPets, getPetsCount } from '@/app/actions/pets';
 
 interface PetsPageProps {
   searchParams: Promise<{

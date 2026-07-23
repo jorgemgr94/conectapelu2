@@ -1,10 +1,12 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
+import { and, count, desc, eq, ilike, or, type SQL } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { count, desc, eq, ilike, or, type SQL, and } from 'drizzle-orm';
 import { db } from '@/db';
 import { usersTable } from '@/db/schema';
+import { clientEnv } from '@/env/client';
+import { serverEnv } from '@/env/server';
 import type { PaginatedResult, QueryOptions } from '@/lib/types';
 
 export type User = typeof usersTable.$inferSelect;
@@ -18,15 +20,17 @@ export interface UserFilters {
 
 // Admin Supabase client for user management
 function getAdminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } },
-  );
+  if (!serverEnv.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for user administration');
+  }
+
+  return createClient(clientEnv.NEXT_PUBLIC_SUPABASE_URL, serverEnv.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
 }
 
 export async function getUsers(
-  options?: QueryOptions<UserFilters>
+  options?: QueryOptions<UserFilters>,
 ): Promise<PaginatedResult<User>> {
   const page = options?.page ?? 1;
   const pageSize = options?.limit ?? 10;
@@ -43,8 +47,8 @@ export async function getUsers(
       or(
         ilike(usersTable.email, searchLower),
         ilike(usersTable.firstName, searchLower),
-        ilike(usersTable.lastName, searchLower)
-      ) as SQL
+        ilike(usersTable.lastName, searchLower),
+      ) as SQL,
     );
   }
 
@@ -130,7 +134,7 @@ export async function createUser(data: {
     return { success: true, user };
   } catch (error) {
     console.error('Error creating user:', error);
-    // Try to rollback auth user if db creation fails? 
+    // Try to rollback auth user if db creation fails?
     // Ideally yes, but keeping it simple as per original implementation for now.
     return { success: false, error: 'Error interno al crear usuario' };
   }

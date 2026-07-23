@@ -6,7 +6,7 @@
 import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { db, generateSlug, getRandomElement, nowISO, schema, type SeedResult } from './config';
+import { db, generateSlug, getRandomElement, nowISO, type SeedResult, schema } from './config';
 import { getAdminUserId } from './users';
 
 // =============================================================================
@@ -26,14 +26,7 @@ const ORGANIZATION_NAMES = [
   'Protectora San Francisco',
 ];
 
-const CITIES = [
-  'Madrid',
-  'Barcelona',
-  'Valencia',
-  'Sevilla',
-  'Zaragoza',
-  'Málaga',
-];
+const CITIES = ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga'];
 
 // =============================================================================
 // Seed function

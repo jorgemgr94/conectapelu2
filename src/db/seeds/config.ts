@@ -8,31 +8,16 @@ import { createClient } from '@supabase/supabase-js';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
+import { clientEnv } from '@/env/client';
+import { serverEnv } from '@/env/server';
+
 import * as schema from '../schema';
-
-// =============================================================================
-// Environment validation
-// =============================================================================
-
-const DATABASE_URL = process.env.DATABASE_URL;
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!DATABASE_URL) {
-  console.error('❌ DATABASE_URL is required');
-  process.exit(1);
-}
-
-if (!SUPABASE_URL) {
-  console.error('❌ NEXT_PUBLIC_SUPABASE_URL is required');
-  process.exit(1);
-}
 
 // =============================================================================
 // Database connection
 // =============================================================================
 
-const client = postgres(DATABASE_URL, { max: 1 });
+const client = postgres(serverEnv.DATABASE_URL, { max: 1 });
 export const db = drizzle(client, { schema });
 
 /**
@@ -52,12 +37,12 @@ export async function closeConnection() {
  * Returns null if SUPABASE_SERVICE_ROLE_KEY is not configured.
  */
 export function getSupabaseAdmin() {
-  if (!SUPABASE_SERVICE_ROLE_KEY) {
+  if (!serverEnv.SUPABASE_SERVICE_ROLE_KEY) {
     console.warn('⚠️  SUPABASE_SERVICE_ROLE_KEY not set - skipping Supabase Auth user creation');
     return null;
   }
 
-  return createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY, {
+  return createClient(clientEnv.NEXT_PUBLIC_SUPABASE_URL, serverEnv.SUPABASE_SERVICE_ROLE_KEY, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

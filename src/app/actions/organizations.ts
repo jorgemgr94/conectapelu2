@@ -1,12 +1,12 @@
 'use server';
 
-import { count, desc, eq, and, ilike, or, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, ilike, or, type SQL } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '@/db';
 import { organizationsTable } from '@/db/schema';
-import type { PaginatedResult, QueryOptions } from '@/lib/types';
 import { createClient } from '@/lib/supabase/server';
+import type { PaginatedResult, QueryOptions } from '@/lib/types';
 
 export type Organization = typeof organizationsTable.$inferSelect;
 export type NewOrganization = typeof organizationsTable.$inferInsert;
@@ -36,18 +36,15 @@ export async function getOrganizations(
       or(
         ilike(organizationsTable.name, searchLower),
         ilike(organizationsTable.slug, searchLower),
-        ilike(organizationsTable.description, searchLower)
-      ) as SQL
+        ilike(organizationsTable.description, searchLower),
+      ) as SQL,
     );
   }
 
   const where = whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
   // Get total count with filters
-  const [totalResult] = await db
-    .select({ count: count() })
-    .from(organizationsTable)
-    .where(where);
+  const [totalResult] = await db.select({ count: count() }).from(organizationsTable).where(where);
 
   const total = totalResult?.count ?? 0;
   const totalPages = Math.ceil(total / pageSize);

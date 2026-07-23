@@ -1,0 +1,30 @@
+name: PR title
+
+on:
+  pull_request:
+    types:
+      - edited
+      - opened
+      - reopened
+      - synchronize
+
+permissions:
+  contents: read
+
+jobs:
+  conventional-title:
+    name: Conventional title
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      PR_TITLE: ${{ github.event.pull_request.title }}
+
+    steps:
+      - name: Validate Conventional Commit title
+        shell: bash
+        run: |
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
+          if [[ ! "$PR_TITLE" =~ $pattern ]]; then
+            echo "::error::PR title must follow Conventional Commits, for example: feat(pets): add pet gallery"
+            exit 1
+          fi

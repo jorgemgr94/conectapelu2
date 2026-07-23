@@ -4,9 +4,9 @@ import { Cat, Dog, Heart, Sparkles, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import type { Pet } from '@/app/actions/pets';
 import { Button } from '@/components/ui/button';
 import { calculatePetAge, getSpeciesLabel } from '@/lib/pets';
-import { type Pet } from '@/app/actions/pets';
 
 export function PetActionModal({ pet }: { pet: Pet | null }) {
   const router = useRouter();

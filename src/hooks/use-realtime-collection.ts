@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { PaginatedResult } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
+import type { PaginatedResult } from '@/lib/types';
 
 interface UseRealtimeCollectionOptions<T> {
   /** Table name to subscribe to */
