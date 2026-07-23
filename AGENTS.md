@@ -54,7 +54,8 @@ Run `pnpm db:migrate` against a disposable database when a migration changes. Ne
 
 ## Code and documentation
 
-- Write UI copy in Spanish (Mexico); write code and technical comments in English.
+- Internationalize user-facing UI copy instead of hardcoding it in components or actions.
+- Support only `es-MX` and `en-US` for now, with `es-MX` as the preferred and default locale.
 - Follow Biome formatting and lint rules instead of hand-formatting around them.
 - Keep secrets, tokens, service keys, private user data, and production database content out of the repository and logs.
 - Document the architecture that exists, not a speculative future abstraction.
