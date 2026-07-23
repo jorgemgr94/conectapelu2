@@ -1,10 +1,11 @@
 import { Heart, PawPrint, ScrollText, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 import { getPet, getRandomPets, type Pet } from '@/app/actions/pets';
 import { CollapsibleSection, PetActionModal } from '@/components/user';
-import { calculatePetAge, getSpeciesLabel } from '@/lib/pets';
+import { getPetAge } from '@/lib/pets';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function UserDashboardPage({
@@ -13,6 +14,11 @@ export default async function UserDashboardPage({
   searchParams: Promise<{ action?: string; petId?: string }>;
 }) {
   const params = await searchParams;
+  const [common, t, format] = await Promise.all([
+    getTranslations('Common'),
+    getTranslations('UserDashboard'),
+    getFormatter(),
+  ]);
   const supabase = await createClient();
   const {
     data: { user },
@@ -31,7 +37,17 @@ export default async function UserDashboardPage({
     petName: string;
     status: string;
     date: string;
-  }> = [{ id: '1', petName: 'Luna', status: 'En revisión', date: '2024-01-15' }];
+  }> = [{ id: '1', petName: 'Luna', status: 'review', date: '2024-01-15' }];
+
+  const getAgeLabel = (birthDate: Date | string | null) => {
+    const age = getPetAge(birthDate);
+    if (!age) return common('pet.unknownAge');
+    return age.unit === 'month'
+      ? common('pet.month', { count: age.count })
+      : common('pet.year', { count: age.count });
+  };
+  const getSpeciesLabel = (species: string) =>
+    species === 'dog' ? common('pet.dog') : common('pet.cat');
 
   return (
     <div className="space-y-6">
@@ -40,18 +56,16 @@ export default async function UserDashboardPage({
         <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/5" />
         <div className="relative">
           <h1 className="text-3xl font-bold">
-            ¡Hola, {user?.email?.split('@')[0] || 'Usuario'}! 👋
+            {t('greeting', { name: user?.email?.split('@')[0] || t('userFallback') })}
           </h1>
-          <p className="mt-2 text-white/80">
-            Bienvenido a tu panel. Aquí puedes ver tus mascotas, apadrinamientos y más.
-          </p>
+          <p className="mt-2 text-white/80">{t('welcome')}</p>
           <div className="mt-6 flex flex-wrap gap-4">
             <Link
               href="/pets"
               className="inline-flex items-center gap-2 rounded-xl bg-white/20 px-4 py-2 text-sm font-medium backdrop-blur-sm transition-colors hover:bg-white/30"
             >
               <PawPrint className="h-4 w-4" />
-              Explorar Peludos
+              {t('explore')}
             </Link>
           </div>
         </div>
@@ -65,7 +79,7 @@ export default async function UserDashboardPage({
             </div>
             <div>
               <p className="text-2xl font-bold text-neutral-900">{adoptedPets.length}</p>
-              <p className="text-sm text-neutral-500">Mascotas adoptadas</p>
+              <p className="text-sm text-neutral-500">{t('adoptedPets')}</p>
             </div>
           </div>
         </div>
@@ -76,7 +90,7 @@ export default async function UserDashboardPage({
             </div>
             <div>
               <p className="text-2xl font-bold text-neutral-900">{sponsoredPets.length}</p>
-              <p className="text-sm text-neutral-500">Apadrinamientos</p>
+              <p className="text-sm text-neutral-500">{t('sponsorships')}</p>
             </div>
           </div>
         </div>
@@ -87,7 +101,7 @@ export default async function UserDashboardPage({
             </div>
             <div>
               <p className="text-2xl font-bold text-neutral-900">{favoritePets.length}</p>
-              <p className="text-sm text-neutral-500">Favoritos</p>
+              <p className="text-sm text-neutral-500">{t('favorites')}</p>
             </div>
           </div>
         </div>
@@ -98,7 +112,7 @@ export default async function UserDashboardPage({
             </div>
             <div>
               <p className="text-2xl font-bold text-neutral-900">{requests.length}</p>
-              <p className="text-sm text-neutral-500">Solicitudes</p>
+              <p className="text-sm text-neutral-500">{t('requests')}</p>
             </div>
           </div>
         </div>
@@ -106,7 +120,7 @@ export default async function UserDashboardPage({
 
       <div className="space-y-4">
         <CollapsibleSection
-          title="Mis Mascotas"
+          title={t('myPets')}
           icon={<PawPrint className="h-5 w-5" />}
           badge={adoptedPets.length}
           isEmpty={adoptedPets.length === 0}
@@ -115,28 +129,32 @@ export default async function UserDashboardPage({
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
                 <PawPrint className="h-8 w-8 text-neutral-400" />
               </div>
-              <h4 className="font-medium text-neutral-900">Aún no tienes mascotas</h4>
-              <p className="mt-1 text-sm text-neutral-500">
-                Cuando adoptes una mascota, aparecerá aquí
-              </p>
+              <h4 className="font-medium text-neutral-900">{t('noPets')}</h4>
+              <p className="mt-1 text-sm text-neutral-500">{t('noPetsDescription')}</p>
               <Link
                 href="/pets"
                 className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary-brand hover:underline"
               >
-                Explorar peludos disponibles →
+                {t('viewPets')} →
               </Link>
             </div>
           }
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {adoptedPets.map((pet) => (
-              <PetCard key={pet.id} pet={pet} />
+              <PetCard
+                key={pet.id}
+                pet={pet}
+                ageLabel={getAgeLabel(pet.birthDate)}
+                speciesLabel={getSpeciesLabel(pet.species)}
+                sponsoredLabel={t('sponsored')}
+              />
             ))}
           </div>
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="Apadrinamientos"
+          title={t('sponsorships')}
           icon={<Sparkles className="h-5 w-5" />}
           badge={sponsoredPets.length}
           isEmpty={sponsoredPets.length === 0}
@@ -145,22 +163,27 @@ export default async function UserDashboardPage({
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
                 <Sparkles className="h-8 w-8 text-neutral-400" />
               </div>
-              <h4 className="font-medium text-neutral-900">Sin apadrinamientos</h4>
-              <p className="mt-1 text-sm text-neutral-500">
-                Apadrina una mascota para ayudar con sus cuidados
-              </p>
+              <h4 className="font-medium text-neutral-900">{t('noSponsorships')}</h4>
+              <p className="mt-1 text-sm text-neutral-500">{t('noSponsorshipsDescription')}</p>
             </div>
           }
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {sponsoredPets.map((pet) => (
-              <PetCard key={pet.id} pet={pet} sponsored />
+              <PetCard
+                key={pet.id}
+                pet={pet}
+                sponsored
+                ageLabel={getAgeLabel(pet.birthDate)}
+                speciesLabel={getSpeciesLabel(pet.species)}
+                sponsoredLabel={t('sponsored')}
+              />
             ))}
           </div>
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="Favoritos"
+          title={t('favorites')}
           icon={<Heart className="h-5 w-5" />}
           badge={favoritePets.length}
           isEmpty={favoritePets.length === 0}
@@ -169,22 +192,27 @@ export default async function UserDashboardPage({
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
                 <Heart className="h-8 w-8 text-neutral-400" />
               </div>
-              <h4 className="font-medium text-neutral-900">Sin favoritos</h4>
-              <p className="mt-1 text-sm text-neutral-500">
-                Guarda tus mascotas favoritas para verlas más tarde
-              </p>
+              <h4 className="font-medium text-neutral-900">{t('noFavorites')}</h4>
+              <p className="mt-1 text-sm text-neutral-500">{t('favoritesDescription')}</p>
             </div>
           }
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {favoritePets.map((pet) => (
-              <PetCard key={pet.id} pet={pet} compact />
+              <PetCard
+                key={pet.id}
+                pet={pet}
+                compact
+                ageLabel={getAgeLabel(pet.birthDate)}
+                speciesLabel={getSpeciesLabel(pet.species)}
+                sponsoredLabel={t('sponsored')}
+              />
             ))}
           </div>
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="Solicitudes"
+          title={t('requests')}
           icon={<ScrollText className="h-5 w-5" />}
           badge={requests.length}
           isEmpty={requests.length === 0}
@@ -193,10 +221,8 @@ export default async function UserDashboardPage({
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
                 <ScrollText className="h-8 w-8 text-neutral-400" />
               </div>
-              <h4 className="font-medium text-neutral-900">Sin solicitudes</h4>
-              <p className="mt-1 text-sm text-neutral-500">
-                Tus solicitudes de adopción aparecerán aquí
-              </p>
+              <h4 className="font-medium text-neutral-900">{t('noRequests')}</h4>
+              <p className="mt-1 text-sm text-neutral-500">{t('requestsDescription')}</p>
             </div>
           }
         >
@@ -207,11 +233,17 @@ export default async function UserDashboardPage({
                 className="flex items-center justify-between rounded-xl bg-neutral-50 p-4"
               >
                 <div>
-                  <p className="font-medium text-neutral-900">Solicitud para {request.petName}</p>
-                  <p className="text-sm text-neutral-500">{request.date}</p>
+                  <p className="font-medium text-neutral-900">
+                    {t('requestFor', { name: request.petName })}
+                  </p>
+                  <p className="text-sm text-neutral-500">
+                    {format.dateTime(new Date(`${request.date}T00:00:00`), {
+                      dateStyle: 'medium',
+                    })}
+                  </p>
                 </div>
                 <span className="rounded-full bg-warning/20 px-3 py-1 text-sm font-medium text-warning-dark">
-                  {request.status}
+                  {t('reviewStatus')}
                 </span>
               </div>
             ))}
@@ -230,10 +262,16 @@ function PetCard({
   pet,
   sponsored = false,
   compact = false,
+  ageLabel,
+  speciesLabel,
+  sponsoredLabel,
 }: {
   pet: Pet;
   sponsored?: boolean;
   compact?: boolean;
+  ageLabel: string;
+  speciesLabel: string;
+  sponsoredLabel: string;
 }) {
   if (!pet) return null;
 
@@ -254,7 +292,7 @@ function PetCard({
           <div className="absolute left-2 top-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-tertiary-highlight px-2 py-0.5 text-xs font-medium text-white">
               <Sparkles className="h-3 w-3" />
-              Apadrinado
+              {sponsoredLabel}
             </span>
           </div>
         )}
@@ -263,7 +301,7 @@ function PetCard({
         <h4 className="font-semibold text-neutral-900">{pet.name}</h4>
         {!compact && (
           <p className="text-sm text-neutral-500">
-            {getSpeciesLabel(pet.species)} · {calculatePetAge(pet.birthDate)}
+            {speciesLabel} · {ageLabel}
           </p>
         )}
       </div>

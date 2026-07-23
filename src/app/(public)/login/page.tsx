@@ -3,15 +3,21 @@
 import { ArrowRight, Building2, Heart, Lock, Mail, Sparkles, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Suspense, useState } from 'react';
 import { getLoginRedirectPath } from '@/app/actions/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LocaleSwitcher } from '@/components/ui/locale-switcher';
 import { Logo } from '@/components/ui/logo';
 import { createClient } from '@/lib/supabase/client';
 
 function LoginForm() {
+  const publicT = useTranslations('Public');
+  const t = useTranslations('Login');
+  const passwordT = useTranslations('Password');
+  const emailT = useTranslations('Email');
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -33,7 +39,7 @@ function LoginForm() {
       const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
       if (authError) {
-        setError(authError.message);
+        setError(t('invalidCredentials'));
         setLoading(false);
         return;
       }
@@ -52,7 +58,7 @@ function LoginForm() {
       router.replace(redirectPath);
     } catch (err) {
       console.error('Login error:', err);
-      setError('Ha ocurrido un error. Por favor, intenta de nuevo.');
+      setError(t('genericError'));
       setLoading(false);
     }
   }
@@ -79,22 +85,19 @@ function LoginForm() {
         />
 
         <div className="relative z-10 flex flex-col justify-between p-12">
-          <Logo size="lg" tagline="Conectando Peludos" />
+          <Logo size="lg" tagline={t('tagline')} />
 
           <div className="flex-1 flex items-center">
             <div className="max-w-md">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm text-primary-highlight backdrop-blur-sm mb-6">
                 <Sparkles className="h-4 w-4" />
-                <span>Únete a nuestra comunidad</span>
+                <span>{t('communityBadge')}</span>
               </div>
               <h1 className="text-5xl font-bold text-white leading-tight mb-6">
-                Donde los peludos encuentran{' '}
-                <span className="text-secondary-highlight">su hogar</span>
+                {t('heroTitle')}{' '}
+                <span className="text-secondary-highlight">{t('heroHighlight')}</span>
               </h1>
-              <p className="text-lg text-neutral-400 mb-8">
-                Cada peludo merece una familia que lo ame. Juntos hacemos posible esa conexión
-                mágica entre corazones.
-              </p>
+              <p className="text-lg text-neutral-400 mb-8">{t('heroDescription')}</p>
 
               <div className="grid grid-cols-3 gap-6">
                 <div className="text-center">
@@ -102,39 +105,42 @@ function LoginForm() {
                     <Building2 className="h-6 w-6 text-primary-highlight" />
                   </div>
                   <p className="text-2xl font-bold text-white">24+</p>
-                  <p className="text-sm text-neutral-500">Organizaciones</p>
+                  <p className="text-sm text-neutral-500">{t('organizations')}</p>
                 </div>
                 <div className="text-center">
                   <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-xl bg-error/20 mb-3">
                     <Heart className="h-6 w-6 text-error" />
                   </div>
                   <p className="text-2xl font-bold text-white">892</p>
-                  <p className="text-sm text-neutral-500">Adopciones</p>
+                  <p className="text-sm text-neutral-500">{t('adoptions')}</p>
                 </div>
                 <div className="text-center">
                   <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-xl bg-tertiary-highlight/20 mb-3">
                     <Users className="h-6 w-6 text-tertiary-highlight" />
                   </div>
                   <p className="text-2xl font-bold text-white">2.8k</p>
-                  <p className="text-sm text-neutral-500">Familias</p>
+                  <p className="text-sm text-neutral-500">{t('families')}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="text-sm text-neutral-600">© 2026 ConectaPelu2. Hecho con 💜</div>
+          <div className="text-sm text-neutral-600">{publicT('copyright')}</div>
         </div>
       </div>
 
       <div className="flex w-full lg:w-1/2 items-center justify-center bg-linear-to-br from-neutral-50 via-white to-primary-light/20 p-8">
         <div className="w-full max-w-md">
+          <div className="mb-6 flex justify-end">
+            <LocaleSwitcher />
+          </div>
           <div className="lg:hidden mb-8 text-center">
             <Logo size="lg" href={undefined} className="justify-center" />
           </div>
 
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-neutral-900">¡Bienvenido de vuelta!</h2>
-            <p className="mt-2 text-neutral-600">Inicia sesión para continuar conectando peludos</p>
+            <h2 className="text-3xl font-bold text-neutral-900">{t('welcome')}</h2>
+            <p className="mt-2 text-neutral-600">{t('subtitle')}</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
@@ -146,14 +152,14 @@ function LoginForm() {
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-neutral-700">
-                Correo electrónico
+                {emailT('label')}
               </Label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="tu@email.com"
+                  placeholder={emailT('loginPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="h-12 rounded-xl border-neutral-200 bg-white pl-11 text-neutral-900 shadow-sm focus:border-primary-highlight focus:ring-4 focus:ring-primary-highlight/10"
@@ -165,13 +171,13 @@ function LoginForm() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-sm font-medium text-neutral-700">
-                  Contraseña
+                  {passwordT('label')}
                 </Label>
                 <Link
                   href="/forgot-password"
                   className="text-sm font-medium text-primary-brand hover:text-primary-dark transition-colors"
                 >
-                  ¿Olvidaste tu contraseña?
+                  {t('forgotPassword')}
                 </Link>
               </div>
               <div className="relative">
@@ -211,11 +217,11 @@ function LoginForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Iniciando sesión...
+                  {t('submitting')}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  Iniciar Sesión
+                  {t('submit')}
                   <ArrowRight className="h-4 w-4" />
                 </span>
               )}
@@ -227,7 +233,7 @@ function LoginForm() {
               <div className="w-full border-t border-neutral-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-neutral-500">¿Nuevo en ConectaPelu2?</span>
+              <span className="bg-white px-4 text-neutral-500">{t('newHere')}</span>
             </div>
           </div>
 
@@ -235,17 +241,17 @@ function LoginForm() {
             href="/signup"
             className="flex h-12 w-full items-center justify-center rounded-xl border-2 border-neutral-200 bg-white text-sm font-medium text-neutral-700 transition-all hover:border-primary-highlight/50 hover:bg-primary-light/20 hover:text-primary-brand"
           >
-            Crear una cuenta
+            {t('createAccount')}
           </Link>
 
           <p className="mt-8 text-center text-xs text-neutral-500">
-            Al iniciar sesión, aceptas nuestros{' '}
+            {t('agreementPrefix')}{' '}
             <Link href="/terms" className="underline hover:text-neutral-700 transition-colors">
-              Términos de Servicio
+              {t('termsOfService')}
             </Link>{' '}
-            y{' '}
+            {t('and')}{' '}
             <Link href="/privacy" className="underline hover:text-neutral-700 transition-colors">
-              Política de Privacidad
+              {t('privacyPolicy')}
             </Link>
           </p>
         </div>
@@ -255,9 +261,13 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const common = useTranslations('Common');
+
   return (
     <Suspense
-      fallback={<div className="min-h-screen flex items-center justify-center">Cargando...</div>}
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">{common('loading')}</div>
+      }
     >
       <LoginForm />
     </Suspense>

@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { getOrganization } from '@/app/actions/organizations';
 import { OrganizationForm } from '@/components/organizations/organization-form';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ export default async function EditOrganizationPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getTranslations('Organizations');
   const { id } = await params;
   const organization = await getOrganization(id);
 
@@ -28,8 +30,8 @@ export default async function EditOrganizationPage({
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Edit Organization</h1>
-          <p className="text-sm text-slate-500">Update details for {organization.name}</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('edit')}</h1>
+          <p className="text-sm text-slate-500">{t('editSubtitle', { name: organization.name })}</p>
         </div>
       </div>
 

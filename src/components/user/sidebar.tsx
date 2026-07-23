@@ -13,19 +13,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/ui/logo';
 import { cn } from '@/lib/utils';
-
-const navigation = [
-  { name: 'Inicio', href: '/user', icon: Home },
-  { name: 'Mis Mascotas', href: '/user/pets', icon: PawPrint },
-  { name: 'Apadrinamientos', href: '/user/sponsorships', icon: Sparkles },
-  { name: 'Favoritos', href: '/user/favorites', icon: Heart },
-  { name: 'Solicitudes', href: '/user/requests', icon: ScrollText },
-  { name: 'Mi Perfil', href: '/user/profile', icon: User },
-];
 
 const UserSidebarContext = createContext<{
   collapsed: boolean;
@@ -57,8 +49,17 @@ export function UserSidebarProvider({ children }: { children: React.ReactNode })
 }
 
 export function UserSidebar() {
+  const t = useTranslations('Navigation');
   const pathname = usePathname();
   const { collapsed, setCollapsed } = useUserSidebar();
+  const navigation = [
+    { name: t('home'), href: '/user', icon: Home },
+    { name: t('myPets'), href: '/user/pets', icon: PawPrint },
+    { name: t('sponsorships'), href: '/user/sponsorships', icon: Sparkles },
+    { name: t('favorites'), href: '/user/favorites', icon: Heart },
+    { name: t('requests'), href: '/user/requests', icon: ScrollText },
+    { name: t('myProfile'), href: '/user/profile', icon: User },
+  ];
 
   return (
     <aside
@@ -77,7 +78,7 @@ export function UserSidebar() {
         <div className={cn('mb-4', collapsed ? 'px-2' : 'px-3')}>
           {!collapsed && (
             <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
-              Mi Cuenta
+              {t('myAccount')}
             </span>
           )}
         </div>
@@ -129,10 +130,10 @@ export function UserSidebar() {
               'flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-neutral-400 transition-all hover:bg-error/10 hover:text-error',
               collapsed && 'justify-center px-3',
             )}
-            title={collapsed ? 'Cerrar Sesión' : undefined}
+            title={collapsed ? t('signOut') : undefined}
           >
             <LogOut className="h-5 w-5 shrink-0" />
-            {!collapsed && <span>Cerrar Sesión</span>}
+            {!collapsed && <span>{t('signOut')}</span>}
           </button>
         </form>
       </div>
@@ -142,6 +143,7 @@ export function UserSidebar() {
         size="icon"
         className="absolute -right-3 top-24 h-6 w-6 rounded-full border border-primary-dark bg-dark-card text-neutral-400 shadow-lg hover:bg-primary-brand hover:text-white"
         onClick={() => setCollapsed(!collapsed)}
+        aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
       >
         {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </Button>

@@ -1,6 +1,8 @@
 import { Bell, Command, Search } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { User } from '@/app/actions/users';
 import { Button } from '@/components/ui/button';
+import { LocaleSwitcher } from '@/components/ui/locale-switcher';
 import { getUserDisplayName, getUserInitials } from '@/lib/utils';
 
 interface HeaderProps {
@@ -9,6 +11,7 @@ interface HeaderProps {
 }
 
 export function OrgHeader({ user, organizationName }: HeaderProps) {
+  const t = useTranslations('OrgHeader');
   const displayName = getUserDisplayName(user);
   const initials = getUserInitials(user);
 
@@ -21,7 +24,7 @@ export function OrgHeader({ user, organizationName }: HeaderProps) {
           </div>
           <input
             type="search"
-            placeholder="Buscar peludos, miembros..."
+            placeholder={t('searchPlaceholder')}
             className="h-11 w-full rounded-xl border border-neutral-200 bg-neutral-50/50 pl-11 pr-20 text-sm text-neutral-900 placeholder:text-neutral-400 transition-all focus:border-tertiary-highlight focus:bg-white focus:outline-none focus:ring-4 focus:ring-tertiary-highlight/10"
           />
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -33,10 +36,12 @@ export function OrgHeader({ user, organizationName }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-4">
+        <LocaleSwitcher />
         <Button
           variant="ghost"
           size="icon"
           className="relative h-11 w-11 rounded-xl text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
+          aria-label={t('notifications')}
         >
           <Bell className="h-5 w-5" />
           <span className="absolute right-2.5 top-2.5 flex h-2 w-2">
@@ -56,7 +61,9 @@ export function OrgHeader({ user, organizationName }: HeaderProps) {
           </div>
           <div className="hidden lg:block">
             <p className="text-sm font-semibold text-neutral-900">{displayName}</p>
-            <p className="text-xs text-neutral-500">{organizationName || 'Organización'}</p>
+            <p className="text-xs text-neutral-500">
+              {organizationName || t('organizationFallback')}
+            </p>
           </div>
         </div>
       </div>

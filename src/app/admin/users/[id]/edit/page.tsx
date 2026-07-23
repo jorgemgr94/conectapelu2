@@ -1,10 +1,12 @@
 import { ArrowLeft, UserCog } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { getUser } from '@/app/actions/users';
 import { UserForm } from '@/components/admin/user-form';
 
 export default async function EditUserPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = await getTranslations('Users');
   const { id } = await params;
   const user = await getUser(id);
 
@@ -27,7 +29,7 @@ export default async function EditUserPage({ params }: { params: Promise<{ id: s
             <UserCog className="h-7 w-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Editar Usuario</h1>
+            <h1 className="text-2xl font-bold text-neutral-900">{t('edit')}</h1>
             <p className="text-sm text-neutral-500">
               {user.firstName} {user.lastName} ({user.email})
             </p>

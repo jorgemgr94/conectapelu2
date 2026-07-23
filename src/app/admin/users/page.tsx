@@ -1,6 +1,7 @@
 import { Calendar, Filter, Mail, Pencil, Plus, Search, Shield, Users, UserX } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import { getUsers } from '@/app/actions/users';
 import { Button } from '@/components/ui/button';
 
@@ -11,6 +12,7 @@ export default async function UsersPage({
 }: {
   searchParams: Promise<{ search?: string; role?: string; status?: string; page?: string }>;
 }) {
+  const [format, t] = await Promise.all([getFormatter(), getTranslations('Users')]);
   const { search, role, status, page } = await searchParams;
   const currentPage = Math.max(1, Number(page) || 1);
 
@@ -60,9 +62,9 @@ export default async function UsersPage({
   const getRoleLabel = (userRole: string) => {
     switch (userRole) {
       case 'app_admin':
-        return 'Administrador';
+        return t('administrators');
       case 'user':
-        return 'Usuario';
+        return t('userRole');
       default:
         return userRole;
     }
@@ -76,17 +78,19 @@ export default async function UsersPage({
             <Users className="h-7 w-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Usuarios</h1>
+            <h1 className="text-2xl font-bold text-neutral-900">{t('title')}</h1>
             <p className="text-sm text-neutral-500">
-              Gestiona los usuarios y sus roles
-              <span className="ml-2 text-neutral-400">({result.pagination.total} total)</span>
+              {t('subtitle')}
+              <span className="ml-2 text-neutral-400">
+                {t('total', { count: result.pagination.total })}
+              </span>
             </p>
           </div>
         </div>
         <Button asChild className="bg-gradient-brand text-white hover:opacity-90">
           <Link href="/admin/users/new">
             <Plus className="mr-2 h-4 w-4" />
-            Nuevo Usuario
+            {t('new')}
           </Link>
         </Button>
       </div>
@@ -100,7 +104,7 @@ export default async function UsersPage({
                 type="search"
                 name="search"
                 defaultValue={search}
-                placeholder="Buscar usuarios por nombre o email..."
+                placeholder={t('searchPlaceholder')}
                 className="h-10 w-full rounded-xl border border-neutral-200 bg-neutral-50/50 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 transition-all focus:border-primary-highlight focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-highlight/10"
               />
             </form>
@@ -108,9 +112,9 @@ export default async function UsersPage({
 
           <div className="hidden items-center gap-2 lg:flex">
             {[
-              { value: '', label: 'Todos', count: roleCounts.all },
-              { value: 'app_admin', label: 'Admins', count: roleCounts.app_admin },
-              { value: 'user', label: 'Usuarios', count: roleCounts.user },
+              { value: '', label: t('all'), count: roleCounts.all },
+              { value: 'app_admin', label: t('administrators'), count: roleCounts.app_admin },
+              { value: 'user', label: t('users'), count: roleCounts.user },
             ].map((option) => (
               <Link
                 key={option.value}
@@ -137,8 +141,8 @@ export default async function UsersPage({
             <div className="mx-1 h-6 w-px bg-neutral-200" />
 
             {[
-              { value: 'active', label: 'Activos', count: statusCounts.active },
-              { value: 'inactive', label: 'Inactivos', count: statusCounts.inactive },
+              { value: 'active', label: t('active'), count: statusCounts.active },
+              { value: 'inactive', label: t('inactive'), count: statusCounts.inactive },
             ].map((option) => (
               <Link
                 key={option.value}
@@ -170,7 +174,7 @@ export default async function UsersPage({
 
         <Button variant="outline" className="gap-2 lg:hidden">
           <Filter className="h-4 w-4" />
-          Filtrar
+          {t('filter')}
         </Button>
       </div>
 
@@ -179,11 +183,9 @@ export default async function UsersPage({
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
             <Users className="h-8 w-8 text-neutral-400" />
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-neutral-900">
-            No se encontraron usuarios
-          </h3>
+          <h3 className="mt-4 text-lg font-semibold text-neutral-900">{t('empty')}</h3>
           <p className="mt-1 text-sm text-neutral-500">
-            {search || role ? 'Intenta ajustar los filtros' : 'Aún no hay usuarios creados'}
+            {search || role ? t('adjustFilters') : t('noneCreated')}
           </p>
         </div>
       ) : (
@@ -202,7 +204,7 @@ export default async function UsersPage({
                 <div className="absolute top-3 right-3">
                   <span className="inline-flex items-center gap-1 rounded-full bg-error-light px-2 py-1 text-xs font-medium text-error">
                     <UserX className="h-3 w-3" />
-                    Inactivo
+                    {t('inactiveSingle')}
                   </span>
                 </div>
               )}
@@ -255,7 +257,7 @@ export default async function UsersPage({
                 </span>
                 {user.emailVerified && (
                   <span className="inline-flex items-center rounded-full bg-success-light px-2.5 py-1 text-xs font-medium text-success">
-                    Verificado
+                    {t('verified')}
                   </span>
                 )}
               </div>
@@ -264,7 +266,7 @@ export default async function UsersPage({
                 <div className="flex items-center gap-1.5 text-xs text-neutral-400">
                   <Calendar className="h-3.5 w-3.5" />
                   <span>
-                    {new Date(user.createdAt).toLocaleDateString('es-ES', {
+                    {format.dateTime(new Date(user.createdAt), {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric',
@@ -274,7 +276,7 @@ export default async function UsersPage({
 
                 <div className="flex gap-1">
                   <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-                    <Link href={`/admin/users/${user.id}/edit`} title="Editar usuario">
+                    <Link href={`/admin/users/${user.id}/edit`} title={t('editTitle')}>
                       <Pencil className="h-4 w-4 text-neutral-500 hover:text-primary-brand" />
                     </Link>
                   </Button>

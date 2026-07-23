@@ -12,18 +12,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/ui/logo';
 import { cn } from '@/lib/utils';
-
-const navigation = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-  { name: 'Organizaciones', href: '/admin/organizations', icon: Building2 },
-  { name: 'Usuarios', href: '/admin/users', icon: Users },
-  { name: 'Peludos', href: '/admin/pets', icon: PawPrint },
-  { name: 'Configuración', href: '/admin/settings', icon: Settings },
-];
 
 const SidebarContext = createContext<{
   collapsed: boolean;
@@ -52,8 +45,16 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function Sidebar() {
+  const t = useTranslations('Navigation');
   const pathname = usePathname();
   const { collapsed, setCollapsed } = useSidebar();
+  const navigation = [
+    { name: t('dashboard'), href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: t('organizations'), href: '/admin/organizations', icon: Building2 },
+    { name: t('users'), href: '/admin/users', icon: Users },
+    { name: t('pets'), href: '/admin/pets', icon: PawPrint },
+    { name: t('settings'), href: '/admin/settings', icon: Settings },
+  ];
 
   return (
     <aside
@@ -65,14 +66,14 @@ export function Sidebar() {
       <div className="absolute left-0 right-0 top-0 h-px bg-linear-to-r from-transparent via-primary-highlight/50 to-transparent" />
 
       <div className="relative flex h-20 items-center justify-between border-b border-white/5 px-6">
-        <Logo size="md" showText={!collapsed} tagline="Admin Portal" href="/admin/dashboard" />
+        <Logo size="md" showText={!collapsed} tagline={t('adminPortal')} href="/admin/dashboard" />
       </div>
 
       <nav className="flex-1 space-y-1 px-4 py-6">
         <div className={cn('mb-4', collapsed ? 'px-2' : 'px-3')}>
           {!collapsed && (
             <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
-              Navegación
+              {t('navigation')}
             </span>
           )}
         </div>
@@ -119,10 +120,10 @@ export function Sidebar() {
               'flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-neutral-400 transition-all hover:bg-error/10 hover:text-error',
               collapsed && 'justify-center px-3',
             )}
-            title={collapsed ? 'Cerrar Sesión' : undefined}
+            title={collapsed ? t('signOut') : undefined}
           >
             <LogOut className="h-5 w-5 shrink-0" />
-            {!collapsed && <span>Cerrar Sesión</span>}
+            {!collapsed && <span>{t('signOut')}</span>}
           </button>
         </form>
       </div>
@@ -132,6 +133,7 @@ export function Sidebar() {
         size="icon"
         className="absolute -right-3 top-24 h-6 w-6 rounded-full border border-primary-dark bg-dark-card text-neutral-400 shadow-lg hover:bg-primary-brand hover:text-white"
         onClick={() => setCollapsed(!collapsed)}
+        aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
       >
         {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </Button>

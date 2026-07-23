@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { Button } from './button';
 
@@ -27,8 +28,9 @@ export function Pagination({
   baseUrl,
   total,
   limit,
-  itemLabel = 'items',
+  itemLabel,
 }: PaginationProps) {
+  const t = useTranslations('Common');
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -78,7 +80,7 @@ export function Pagination({
         className="gap-1"
       >
         <ChevronLeft className="h-4 w-4" />
-        Anterior
+        {t('previous')}
       </Button>
 
       <div className="flex items-center gap-1">
@@ -110,14 +112,18 @@ export function Pagination({
         onClick={() => router.push(createPageUrl(currentPage + 1))}
         className="gap-1"
       >
-        Siguiente
+        {t('next')}
         <ChevronRight className="h-4 w-4" />
       </Button>
 
       {total !== undefined && limit !== undefined && (
         <p className="ml-4 text-sm text-neutral-500">
-          Mostrando {(currentPage - 1) * limit + 1} a {Math.min(currentPage * limit, total)} de{' '}
-          {total} {itemLabel}
+          {t('showing', {
+            from: (currentPage - 1) * limit + 1,
+            to: Math.min(currentPage * limit, total),
+            total,
+            items: itemLabel ?? t('items'),
+          })}
         </p>
       )}
     </div>

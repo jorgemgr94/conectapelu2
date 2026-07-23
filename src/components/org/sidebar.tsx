@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/ui/logo';
@@ -60,15 +61,17 @@ export function OrgSidebarProvider({
 }
 
 export function OrgSidebar() {
+  const common = useTranslations('Common');
+  const t = useTranslations('Navigation');
   const pathname = usePathname();
   const { collapsed, setCollapsed, organizationSlug, organizationName } = useOrgSidebar();
 
   const navigation = [
-    { name: 'Dashboard', href: `/org/${organizationSlug}/dashboard`, icon: LayoutDashboard },
-    { name: 'Peludos', href: `/org/${organizationSlug}/pets`, icon: PawPrint },
-    { name: 'Adopciones', href: `/org/${organizationSlug}/adoptions`, icon: Heart },
-    { name: 'Miembros', href: `/org/${organizationSlug}/members`, icon: Users },
-    { name: 'Configuración', href: `/org/${organizationSlug}/settings`, icon: Settings },
+    { name: t('dashboard'), href: `/org/${organizationSlug}/dashboard`, icon: LayoutDashboard },
+    { name: t('pets'), href: `/org/${organizationSlug}/pets`, icon: PawPrint },
+    { name: t('adoptions'), href: `/org/${organizationSlug}/adoptions`, icon: Heart },
+    { name: t('members'), href: `/org/${organizationSlug}/members`, icon: Users },
+    { name: t('settings'), href: `/org/${organizationSlug}/settings`, icon: Settings },
   ];
 
   return (
@@ -88,10 +91,10 @@ export function OrgSidebar() {
             <Logo size="sm" showText={false} href={undefined} />
             <div className="flex flex-col">
               <span className="text-lg font-bold text-white truncate max-w-[160px]">
-                {organizationName || 'Organización'}
+                {organizationName || common('organization')}
               </span>
               <span className="text-[10px] font-medium uppercase tracking-wider text-tertiary-highlight">
-                Portal Org
+                {t('organizationPortal')}
               </span>
             </div>
           </Link>
@@ -102,7 +105,7 @@ export function OrgSidebar() {
         <div className={cn('mb-4', collapsed ? 'px-2' : 'px-3')}>
           {!collapsed && (
             <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
-              Navegación
+              {t('navigation')}
             </span>
           )}
         </div>
@@ -148,10 +151,10 @@ export function OrgSidebar() {
             'flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-medium text-neutral-500 transition-all hover:bg-white/5 hover:text-neutral-300',
             collapsed && 'justify-center px-3',
           )}
-          title={collapsed ? 'Portal Admin' : undefined}
+          title={collapsed ? t('adminPortal') : undefined}
         >
           <PawPrint className="h-4 w-4 shrink-0" />
-          {!collapsed && <span>Ir al Portal Admin</span>}
+          {!collapsed && <span>{t('goToAdminPortal')}</span>}
         </Link>
       </div>
 
@@ -163,10 +166,10 @@ export function OrgSidebar() {
               'flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-neutral-400 transition-all hover:bg-error/10 hover:text-error',
               collapsed && 'justify-center px-3',
             )}
-            title={collapsed ? 'Cerrar Sesión' : undefined}
+            title={collapsed ? t('signOut') : undefined}
           >
             <LogOut className="h-5 w-5 shrink-0" />
-            {!collapsed && <span>Cerrar Sesión</span>}
+            {!collapsed && <span>{t('signOut')}</span>}
           </button>
         </form>
       </div>
@@ -176,6 +179,7 @@ export function OrgSidebar() {
         size="icon"
         className="absolute -right-3 top-24 h-6 w-6 rounded-full border border-tertiary-highlight/50 bg-dark-card text-neutral-400 shadow-lg hover:bg-tertiary-highlight hover:text-white"
         onClick={() => setCollapsed(!collapsed)}
+        aria-label={collapsed ? t('expandSidebar') : t('collapseSidebar')}
       >
         {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </Button>

@@ -1,10 +1,13 @@
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { OrganizationForm } from '@/components/organizations/organization-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function NewOrganizationPage() {
+  const t = useTranslations('Organizations');
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -15,10 +18,8 @@ export default function NewOrganizationPage() {
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Crear Organización</h1>
-          <p className="text-sm text-slate-500">
-            Agrega una nueva organización de rescate a la plataforma
-          </p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('create')}</h1>
+          <p className="text-sm text-slate-500">{t('createSubtitle')}</p>
         </div>
       </div>
 
