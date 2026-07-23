@@ -78,6 +78,13 @@ equivalent.
 Use a direct database URL for migrations. A deployment may use a transaction-pooler-compatible
 URL for application traffic; keep the distinction explicit in deployment configuration.
 
+### Supabase Auth configuration
+
+Add `<app-origin>/auth/callback` to the Supabase Auth redirect allow list for every environment
+(for example, `http://localhost:3000/auth/callback`). Password recovery also requires a working
+email provider; configure production SMTP in Supabase before relying on it outside local
+development.
+
 ## Commands
 
 | Command | Purpose |

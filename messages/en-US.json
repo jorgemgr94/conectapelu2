@@ -116,7 +116,28 @@
     "and": "and",
     "privacyPolicy": "Privacy policy",
     "genericError": "An error occurred. Please try again.",
-    "invalidCredentials": "The sign-in details are incorrect."
+    "invalidCredentials": "The sign-in details are incorrect.",
+    "passwordResetSuccess": "Your password was updated. You can now sign in."
+  },
+  "PasswordReset": {
+    "requestTitle": "Reset your password",
+    "requestDescription": "Enter your email and we'll send you a secure link to choose a new password.",
+    "sendLink": "Send link",
+    "sending": "Sending...",
+    "emailSent": "If an account exists for that email, you'll receive a password reset link.",
+    "requestError": "We couldn't send the link. Try again in a few minutes.",
+    "invalidLink": "This link is invalid or has expired. Request a new one.",
+    "backToLogin": "Back to sign in",
+    "updateTitle": "Choose a new password",
+    "updateDescription": "Use a secure password that you haven't used before.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "passwordHelp": "Minimum 8 characters",
+    "passwordLength": "The password must be at least 8 characters.",
+    "passwordMismatch": "The passwords don't match.",
+    "updatePassword": "Update password",
+    "updating": "Updating...",
+    "updateError": "We couldn't update your password. Request a new link and try again."
   },
   "Home": {
     "heroTitle": "Pets waiting for their",

@@ -116,7 +116,28 @@
     "and": "y",
     "privacyPolicy": "Política de privacidad",
     "genericError": "Ha ocurrido un error. Por favor, intenta de nuevo.",
-    "invalidCredentials": "Los datos de acceso son incorrectos."
+    "invalidCredentials": "Los datos de acceso son incorrectos.",
+    "passwordResetSuccess": "Tu contraseña se actualizó. Ya puedes iniciar sesión."
+  },
+  "PasswordReset": {
+    "requestTitle": "Restablece tu contraseña",
+    "requestDescription": "Ingresa tu correo y te enviaremos un enlace seguro para elegir una nueva contraseña.",
+    "sendLink": "Enviar enlace",
+    "sending": "Enviando...",
+    "emailSent": "Si existe una cuenta con ese correo, recibirás un enlace para restablecer tu contraseña.",
+    "requestError": "No pudimos enviar el enlace. Intenta de nuevo en unos minutos.",
+    "invalidLink": "Este enlace no es válido o ya expiró. Solicita uno nuevo.",
+    "backToLogin": "Volver a iniciar sesión",
+    "updateTitle": "Elige una nueva contraseña",
+    "updateDescription": "Usa una contraseña segura que no hayas utilizado antes.",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "passwordHelp": "Mínimo 8 caracteres",
+    "passwordLength": "La contraseña debe tener al menos 8 caracteres.",
+    "passwordMismatch": "Las contraseñas no coinciden.",
+    "updatePassword": "Actualizar contraseña",
+    "updating": "Actualizando...",
+    "updateError": "No pudimos actualizar tu contraseña. Solicita un nuevo enlace e intenta de nuevo."
   },
   "Home": {
     "heroTitle": "Peludos esperando por su hogar",
