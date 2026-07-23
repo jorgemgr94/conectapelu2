@@ -21,6 +21,13 @@ pnpm install --frozen-lockfile
 
 Copy `.env.example` to `.env.local` and replace its placeholders. Never commit real credentials.
 
+### VS Code
+
+When the repository opens in VS Code, install the recommended workspace extensions. The shared
+settings use the project's Biome dependency to format, apply safe fixes, and organize imports on
+save. They also select the workspace TypeScript version and enforce the repository's two-space,
+100-column, LF/newline conventions.
+
 ## Branches
 
 Create branches from `main` and use:
