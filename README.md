@@ -89,11 +89,7 @@ URL for application traffic; keep the distinction explicit in deployment configu
 
 ## Documentation
 
-- [CRUD scaffolding guide](docs/crud-scaffolding.md)
 - [Contribution guide](CONTRIBUTING.md)
-
-The current CRUD guide predates recent direct-Drizzle refactors and should be updated alongside
-the first reference CRUD implementation.
 
 ## Pull requests
 
