@@ -3,6 +3,7 @@
 import { typeboxResolver } from '@hookform/resolvers/typebox';
 import { type Static, Type } from '@sinclair/typebox';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import type { Organization } from '@/app/actions/organizations';
@@ -30,6 +31,8 @@ const formSchema = Type.Object({
 type FormData = Static<typeof formSchema>;
 
 export function OrganizationForm({ organization }: { organization?: Organization }) {
+  const common = useTranslations('Common');
+  const t = useTranslations('Organizations');
   const router = useRouter();
   const isEditing = !!organization;
 
@@ -47,14 +50,14 @@ export function OrganizationForm({ organization }: { organization?: Organization
     try {
       if (isEditing) {
         await updateOrganization(organization.id, data);
-        toast.success('Organización actualizada exitosamente');
+        toast.success(t('updated'));
       } else {
         await createOrganization(data);
-        toast.success('Organización creada exitosamente');
+        toast.success(t('created'));
       }
       router.push('/admin/organizations');
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Algo salió mal');
+    } catch {
+      toast.error(t('saveError'));
     }
   }
 
@@ -66,9 +69,9 @@ export function OrganizationForm({ organization }: { organization?: Organization
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre</FormLabel>
+              <FormLabel>{t('name')}</FormLabel>
               <FormControl>
-                <Input placeholder="Nombre de la organización" {...field} />
+                <Input placeholder={t('namePlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -80,9 +83,9 @@ export function OrganizationForm({ organization }: { organization?: Organization
           name="slug"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Slug</FormLabel>
+              <FormLabel>{t('slug')}</FormLabel>
               <FormControl>
-                <Input placeholder="nombre-organizacion" {...field} />
+                <Input placeholder={t('slugPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -94,9 +97,9 @@ export function OrganizationForm({ organization }: { organization?: Organization
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Descripción</FormLabel>
+              <FormLabel>{t('description')}</FormLabel>
               <FormControl>
-                <Textarea placeholder="Descripción de la organización" {...field} />
+                <Textarea placeholder={t('descriptionPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -108,9 +111,9 @@ export function OrganizationForm({ organization }: { organization?: Organization
           name="logo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL del Logo</FormLabel>
+              <FormLabel>{t('logoUrl')}</FormLabel>
               <FormControl>
-                <Input placeholder="https://ejemplo.com/logo.png" {...field} />
+                <Input placeholder={t('logoUrlPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -120,13 +123,13 @@ export function OrganizationForm({ organization }: { organization?: Organization
         <div className="flex gap-4">
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting
-              ? 'Guardando...'
+              ? t('saving')
               : isEditing
-                ? 'Actualizar Organización'
-                : 'Crear Organización'}
+                ? t('updateSubmit')
+                : t('createSubmit')}
           </Button>
           <Button type="button" variant="outline" onClick={() => router.back()}>
-            Cancelar
+            {common('cancel')}
           </Button>
         </div>
       </form>

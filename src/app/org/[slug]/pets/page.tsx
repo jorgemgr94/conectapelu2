@@ -1,6 +1,7 @@
 import { Eye, Filter, Heart, PawPrint, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 
 interface OrgPetsPageProps {
@@ -11,68 +12,69 @@ interface OrgPetsPageProps {
 export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageProps) {
   const { slug } = await params;
   const { search, status } = await searchParams;
+  const [common, t] = await Promise.all([getTranslations('Common'), getTranslations('OrgPets')]);
 
   // Placeholder data with cute images
   let pets = [
     {
       id: '1',
       name: 'Luna',
-      type: 'Dog',
+      type: 'dog',
       breed: 'Golden Retriever',
-      age: '2 years',
+      age: 2,
       status: 'available',
       image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&h=400&fit=crop',
-      description: 'Friendly and loves to play fetch!',
+      description: t('demo.luna'),
     },
     {
       id: '2',
       name: 'Max',
-      type: 'Dog',
+      type: 'dog',
       breed: 'Labrador',
-      age: '3 years',
+      age: 3,
       status: 'pending',
       image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop',
-      description: 'Gentle giant who loves cuddles.',
+      description: t('demo.max'),
     },
     {
       id: '3',
       name: 'Michi',
-      type: 'Cat',
+      type: 'cat',
       breed: 'Siamese',
-      age: '1 year',
+      age: 1,
       status: 'available',
       image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&h=400&fit=crop',
-      description: 'Curious and playful kitten.',
+      description: t('demo.michi'),
     },
     {
       id: '4',
       name: 'Rocky',
-      type: 'Dog',
+      type: 'dog',
       breed: 'German Shepherd',
-      age: '4 years',
+      age: 4,
       status: 'adopted',
       image: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=400&h=400&fit=crop',
-      description: 'Loyal and protective friend.',
+      description: t('demo.rocky'),
     },
     {
       id: '5',
       name: 'Bella',
-      type: 'Cat',
+      type: 'cat',
       breed: 'Persian',
-      age: '2 years',
+      age: 2,
       status: 'available',
       image: 'https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=400&h=400&fit=crop',
-      description: 'Fluffy and loves to nap in sunny spots.',
+      description: t('demo.bella'),
     },
     {
       id: '6',
       name: 'Cooper',
-      type: 'Dog',
+      type: 'dog',
       breed: 'Beagle',
-      age: '1 year',
+      age: 1,
       status: 'available',
       image: 'https://images.unsplash.com/photo-1505628346881-b72b27e84530?w=400&h=400&fit=crop',
-      description: 'Energetic pup who loves adventures.',
+      description: t('demo.cooper'),
     },
   ];
 
@@ -106,8 +108,8 @@ export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageP
             <PawPrint className="h-7 w-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Pets</h1>
-            <p className="text-sm text-slate-500">Manage your organization's pets for adoption</p>
+            <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
+            <p className="text-sm text-slate-500">{t('subtitle')}</p>
           </div>
         </div>
         <Button
@@ -116,7 +118,7 @@ export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageP
         >
           <Link href={`/org/${slug}/pets/new`}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Pet
+            {t('add')}
           </Link>
         </Button>
       </div>
@@ -132,7 +134,7 @@ export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageP
                 type="search"
                 name="search"
                 defaultValue={search}
-                placeholder="Search pets..."
+                placeholder={t('searchPlaceholder')}
                 className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition-all focus:border-emerald-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
               />
             </form>
@@ -141,10 +143,22 @@ export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageP
           {/* Status Filter Pills */}
           <div className="hidden items-center gap-2 lg:flex">
             {[
-              { value: '', label: 'All', count: statusCounts.all },
-              { value: 'available', label: 'Available', count: statusCounts.available },
-              { value: 'pending', label: 'Pending', count: statusCounts.pending },
-              { value: 'adopted', label: 'Adopted', count: statusCounts.adopted },
+              { value: '', label: common('all'), count: statusCounts.all },
+              {
+                value: 'available',
+                label: common('status.available'),
+                count: statusCounts.available,
+              },
+              {
+                value: 'pending',
+                label: common('status.pending'),
+                count: statusCounts.pending,
+              },
+              {
+                value: 'adopted',
+                label: common('status.adopted'),
+                count: statusCounts.adopted,
+              },
             ].map((option) => (
               <Link
                 key={option.value}
@@ -173,7 +187,7 @@ export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageP
         {/* Mobile Filter */}
         <Button variant="outline" className="gap-2 lg:hidden">
           <Filter className="h-4 w-4" />
-          Filter
+          {t('filter')}
         </Button>
       </div>
 
@@ -183,15 +197,15 @@ export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageP
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
             <PawPrint className="h-8 w-8 text-slate-400" />
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-slate-900">No pets found</h3>
+          <h3 className="mt-4 text-lg font-semibold text-slate-900">{t('empty')}</h3>
           <p className="mt-1 text-sm text-slate-500">
-            {search || status ? 'Try adjusting your filters' : 'Add your first pet for adoption'}
+            {search || status ? t('adjustFilters') : t('addFirst')}
           </p>
           {!search && !status && (
             <Button asChild className="mt-4" variant="outline">
               <Link href={`/org/${slug}/pets/new`}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add Pet
+                {t('add')}
               </Link>
             </Button>
           )}
@@ -224,7 +238,7 @@ export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageP
                           : 'bg-blue-500/90 text-white'
                     }`}
                   >
-                    {pet.status}
+                    {common(`status.${pet.status}`)}
                   </span>
                 </div>
                 {/* Quick Actions */}
@@ -253,11 +267,11 @@ export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageP
                   <div>
                     <h3 className="text-lg font-semibold text-slate-900">{pet.name}</h3>
                     <p className="text-sm text-slate-500">
-                      {pet.breed} · {pet.age}
+                      {pet.breed} · {common('pet.year', { count: pet.age })}
                     </p>
                   </div>
                   <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                    {pet.type}
+                    {pet.type === 'dog' ? common('pet.dog') : common('pet.cat')}
                   </span>
                 </div>
                 <p className="mb-4 text-sm text-slate-600 line-clamp-2">{pet.description}</p>
@@ -265,7 +279,7 @@ export default async function OrgPetsPage({ params, searchParams }: OrgPetsPageP
                   <Button variant="outline" size="sm" className="flex-1" asChild>
                     <Link href={`/org/${slug}/pets/${pet.id}/edit`}>
                       <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                      Edit
+                      {common('edit')}
                     </Link>
                   </Button>
                   <Button

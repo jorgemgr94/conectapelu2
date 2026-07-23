@@ -3,14 +3,17 @@
 import { Cat, Dog, Heart, Sparkles, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import type { Pet } from '@/app/actions/pets';
 import { Button } from '@/components/ui/button';
-import { calculatePetAge, getSpeciesLabel } from '@/lib/pets';
+import { getPetAge } from '@/lib/pets';
 
 export function PetActionModal({ pet }: { pet: Pet | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const common = useTranslations('Common');
+  const t = useTranslations('PetAction');
   const action = searchParams.get('action');
   const petId = searchParams.get('petId');
   const [isOpen, setIsOpen] = useState(false);
@@ -31,16 +34,20 @@ export function PetActionModal({ pet }: { pet: Pet | null }) {
   if (!isOpen || !pet) return null;
 
   const isAdopt = action === 'adopt';
-  const actionTitle = isAdopt ? 'Solicitar Adopción' : 'Apadrinar Mascota';
-  const actionDescription = isAdopt
-    ? 'Estás a punto de iniciar el proceso de adopción. Te contactaremos pronto.'
-    : 'Al apadrinar, ayudas a cubrir los gastos de cuidado de esta mascota.';
+  const actionTitle = isAdopt ? t('adoptTitle') : t('sponsorTitle');
+  const actionDescription = isAdopt ? t('adoptDescription') : t('sponsorDescription');
+  const petAge = getPetAge(pet.birthDate);
+  const ageLabel = petAge
+    ? petAge.unit === 'month'
+      ? common('pet.month', { count: petAge.count })
+      : common('pet.year', { count: petAge.count })
+    : common('pet.unknownAge');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <button
         type="button"
-        aria-label="Cerrar modal"
+        aria-label={t('close')}
         className="absolute inset-0 bg-black/50 backdrop-blur-sm cursor-default"
         onClick={handleClose}
         onKeyDown={(e) => e.key === 'Escape' && handleClose()}
@@ -49,6 +56,7 @@ export function PetActionModal({ pet }: { pet: Pet | null }) {
       <div className="relative w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
         <button
           type="button"
+          aria-label={t('close')}
           onClick={handleClose}
           className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600"
         >
@@ -80,12 +88,12 @@ export function PetActionModal({ pet }: { pet: Pet | null }) {
                   ) : (
                     <Cat className="h-3 w-3" />
                   )}
-                  {getSpeciesLabel(pet.species)}
+                  {pet.species === 'dog' ? common('pet.dog') : common('pet.cat')}
                 </span>
               </div>
               <h3 className="text-lg font-bold text-neutral-900">{pet.name}</h3>
               <p className="text-sm text-neutral-500">
-                {pet.breed} · {calculatePetAge(pet.birthDate)}
+                {pet.breed} · {ageLabel}
               </p>
               <p className="text-xs text-neutral-400">{pet.organizationName}</p>
             </div>
@@ -94,22 +102,22 @@ export function PetActionModal({ pet }: { pet: Pet | null }) {
 
         <div className="mb-6 rounded-xl border-2 border-dashed border-neutral-200 bg-neutral-50/50 p-8 text-center">
           <p className="text-sm text-neutral-500">
-            📋 Formulario de {isAdopt ? 'adopción' : 'apadrinamiento'} próximamente
+            {t('comingSoon', {
+              action: isAdopt ? t('adoption') : t('sponsorship'),
+            })}
           </p>
-          <p className="mt-1 text-xs text-neutral-400">
-            Por ahora, solo mostramos la mascota seleccionada
-          </p>
+          <p className="mt-1 text-xs text-neutral-400">{t('selectedPetOnly')}</p>
         </div>
 
         <div className="flex gap-3">
           <Button variant="outline" className="flex-1" onClick={handleClose}>
-            Cancelar
+            {common('cancel')}
           </Button>
           <Button
             className={`flex-1 ${isAdopt ? 'bg-gradient-brand' : 'bg-gradient-tertiary'} text-white hover:opacity-90`}
             onClick={handleClose}
           >
-            {isAdopt ? 'Enviar Solicitud' : 'Confirmar Apadrinamiento'}
+            {isAdopt ? t('submitAdoption') : t('confirmSponsorship')}
           </Button>
         </div>
       </div>

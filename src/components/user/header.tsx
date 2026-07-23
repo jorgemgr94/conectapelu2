@@ -1,10 +1,14 @@
 import { Bell, Search } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import type { User } from '@/app/actions/users';
 import { Button } from '@/components/ui/button';
+import { LocaleSwitcher } from '@/components/ui/locale-switcher';
 import { getUserDisplayName, getUserInitials } from '@/lib/utils';
 
 export function UserHeader({ user }: { user: User }) {
+  const navigation = useTranslations('Navigation');
+  const t = useTranslations('UserHeader');
   const displayName = getUserDisplayName(user);
   const initials = getUserInitials(user);
 
@@ -17,25 +21,27 @@ export function UserHeader({ user }: { user: User }) {
           </div>
           <input
             type="search"
-            placeholder="Buscar mascotas..."
+            placeholder={t('searchPlaceholder')}
             className="h-11 w-full rounded-xl border border-neutral-200 bg-neutral-50/50 pl-11 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 transition-all focus:border-primary-highlight focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-highlight/10"
           />
         </div>
       </div>
 
       <div className="flex items-center gap-4">
+        <LocaleSwitcher />
         <Button
           asChild
           variant="ghost"
           className="hidden text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 sm:flex"
         >
-          <Link href="/pets">Adopta</Link>
+          <Link href="/pets">{navigation('adopt')}</Link>
         </Button>
 
         <Button
           variant="ghost"
           size="icon"
           className="relative h-11 w-11 rounded-xl text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
+          aria-label={t('notifications')}
         >
           <Bell className="h-5 w-5" />
           <span className="absolute right-2.5 top-2.5 flex h-2 w-2">
@@ -55,7 +61,7 @@ export function UserHeader({ user }: { user: User }) {
           </div>
           <div className="hidden lg:block">
             <p className="text-sm font-semibold text-neutral-900">{displayName}</p>
-            <p className="text-xs text-neutral-500">Mi cuenta</p>
+            <p className="text-xs text-neutral-500">{t('myAccount')}</p>
           </div>
         </Link>
       </div>

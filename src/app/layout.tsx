@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 
 import { Toaster } from '@/components/ui/sonner';
 
@@ -7,17 +9,25 @@ import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: 'ConectaPelu2 - Pet Adoption Platform',
-  description: 'Connect rescue organizations with pet adopters',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('Metadata');
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [locale, messages] = await Promise.all([getLocale(), getMessages()]);
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body className={inter.className}>
-        {children}
-        <Toaster />
+        <NextIntlClientProvider messages={messages}>
+          {children}
+          <Toaster />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

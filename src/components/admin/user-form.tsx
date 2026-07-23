@@ -3,6 +3,7 @@
 import { Camera, Eye, EyeOff, Loader2, Mail, MapPin, Phone, User } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { User as UserType } from '@/app/actions/users';
@@ -14,6 +15,10 @@ import { createClient } from '@/lib/supabase/client';
 
 export function UserForm({ user }: { user?: UserType }) {
   const router = useRouter();
+  const common = useTranslations('Common');
+  const t = useTranslations('UserForm');
+  const passwordT = useTranslations('Password');
+  const emailT = useTranslations('Email');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!user;
 
@@ -29,7 +34,7 @@ export function UserForm({ user }: { user?: UserType }) {
     if (file) {
       // Validate file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        setError('La imagen no puede superar 2MB');
+        setError(common('imageTooLarge'));
         return;
       }
       setAvatarFile(file);
@@ -77,7 +82,7 @@ export function UserForm({ user }: { user?: UserType }) {
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
-        setError(`Error al subir imagen: ${uploadError.message}`);
+        setError(common('imageUploadErrorWithReason', { reason: uploadError.message }));
         return user?.avatar ?? null;
       }
 
@@ -91,7 +96,7 @@ export function UserForm({ user }: { user?: UserType }) {
       return publicUrl;
     } catch (err) {
       console.error('Avatar upload failed:', err);
-      setError('Error al subir la imagen');
+      setError(common('imageUploadError'));
       return user?.avatar ?? null;
     } finally {
       setUploadingAvatar(false);
@@ -127,12 +132,12 @@ export function UserForm({ user }: { user?: UserType }) {
         });
 
         if (!result) {
-          setError('Error al actualizar usuario');
+          setError(t('updateError'));
           setLoading(false);
           return;
         }
 
-        toast.success('Usuario actualizado exitosamente');
+        toast.success(t('updated'));
       } else {
         // CREATE MODE
         const email = formData.get('email') as string;
@@ -149,7 +154,7 @@ export function UserForm({ user }: { user?: UserType }) {
         });
 
         if (!result.success) {
-          setError(result.error || 'Error al crear usuario');
+          setError(t('createError'));
           setLoading(false);
           return;
         }
@@ -162,14 +167,14 @@ export function UserForm({ user }: { user?: UserType }) {
           }
         }
 
-        toast.success('Usuario creado exitosamente');
+        toast.success(t('created'));
       }
 
       router.push('/admin/users');
       router.refresh();
     } catch (err) {
       console.error('Submit error:', err);
-      setError(isEditing ? 'Error al actualizar usuario' : 'Error al crear usuario');
+      setError(isEditing ? t('updateError') : t('createError'));
     } finally {
       setLoading(false);
     }
@@ -190,7 +195,7 @@ export function UserForm({ user }: { user?: UserType }) {
             {avatarPreview ? (
               <Image
                 src={avatarPreview}
-                alt="Avatar preview"
+                alt={t('avatarPreviewAlt')}
                 fill
                 className="object-cover"
                 unoptimized
@@ -201,6 +206,7 @@ export function UserForm({ user }: { user?: UserType }) {
           </div>
           <button
             type="button"
+            aria-label={t('changeAvatar')}
             onClick={() => fileInputRef.current?.click()}
             className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-neutral-600 shadow-md transition-colors hover:bg-neutral-50"
           >
@@ -215,20 +221,20 @@ export function UserForm({ user }: { user?: UserType }) {
           />
         </div>
         <div>
-          <p className="font-medium text-neutral-900">Foto de perfil</p>
-          <p className="text-sm text-neutral-500">JPG, PNG o GIF. Máximo 2MB.</p>
-          {avatarFile && <p className="mt-1 text-xs text-success">Nueva imagen seleccionada</p>}
+          <p className="font-medium text-neutral-900">{t('avatar')}</p>
+          <p className="text-sm text-neutral-500">{t('avatarHelp')}</p>
+          {avatarFile && <p className="mt-1 text-xs text-success">{t('newImageSelected')}</p>}
         </div>
       </div>
 
       {/* Form Fields - Row 1: Name */}
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="firstName">Nombre *</Label>
+          <Label htmlFor="firstName">{t('firstName')} *</Label>
           <Input
             id="firstName"
             name="firstName"
-            placeholder="Juan"
+            placeholder={t('firstNamePlaceholder')}
             defaultValue={user?.firstName ?? ''}
             required
             className="h-11"
@@ -236,11 +242,11 @@ export function UserForm({ user }: { user?: UserType }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="lastName">Apellido *</Label>
+          <Label htmlFor="lastName">{t('lastName')} *</Label>
           <Input
             id="lastName"
             name="lastName"
-            placeholder="Pérez"
+            placeholder={t('lastNamePlaceholder')}
             defaultValue={user?.lastName ?? ''}
             required
             className="h-11"
@@ -251,28 +257,28 @@ export function UserForm({ user }: { user?: UserType }) {
       {/* Row 2: Email & Password (password only for create) */}
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="email">Correo electrónico {!isEditing && '*'}</Label>
+          <Label htmlFor="email">
+            {emailT('label')} {!isEditing && '*'}
+          </Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="juan@ejemplo.com"
+              placeholder={emailT('userPlaceholder')}
               defaultValue={user?.email ?? ''}
               disabled={isEditing}
               required={!isEditing}
               className={`h-11 pl-10 ${isEditing ? 'bg-neutral-100 cursor-not-allowed' : ''}`}
             />
           </div>
-          {isEditing && (
-            <p className="text-xs text-neutral-500">El email no puede ser modificado</p>
-          )}
+          {isEditing && <p className="text-xs text-neutral-500">{emailT('locked')}</p>}
         </div>
 
         {!isEditing ? (
           <div className="space-y-2">
-            <Label htmlFor="password">Contraseña *</Label>
+            <Label htmlFor="password">{passwordT('label')} *</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -285,17 +291,18 @@ export function UserForm({ user }: { user?: UserType }) {
               />
               <button
                 type="button"
+                aria-label={showPassword ? passwordT('hide') : passwordT('show')}
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            <p className="text-xs text-neutral-500">Mínimo 8 caracteres</p>
+            <p className="text-xs text-neutral-500">{passwordT('minimumLength')}</p>
           </div>
         ) : (
           <div className="space-y-2">
-            <Label htmlFor="status">Estado *</Label>
+            <Label htmlFor="status">{t('status')} *</Label>
             <select
               id="status"
               name="status"
@@ -303,8 +310,8 @@ export function UserForm({ user }: { user?: UserType }) {
               required
               className="flex h-11 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-highlight focus-visible:ring-offset-2"
             >
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
+              <option value="active">{common('active')}</option>
+              <option value="inactive">{common('inactive')}</option>
             </select>
           </div>
         )}
@@ -313,14 +320,14 @@ export function UserForm({ user }: { user?: UserType }) {
       {/* Row 3: Phone & Role */}
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="phone">Teléfono</Label>
+          <Label htmlFor="phone">{t('phone')}</Label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
             <Input
               id="phone"
               name="phone"
               type="tel"
-              placeholder="+52 81 1234 5678"
+              placeholder={t('phonePlaceholder')}
               defaultValue={user?.phone ?? ''}
               className="h-11 pl-10"
             />
@@ -328,7 +335,7 @@ export function UserForm({ user }: { user?: UserType }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="role">Rol *</Label>
+          <Label htmlFor="role">{t('role')} *</Label>
           <select
             id="role"
             name="role"
@@ -336,9 +343,9 @@ export function UserForm({ user }: { user?: UserType }) {
             required
             className="flex h-11 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-highlight focus-visible:ring-offset-2"
           >
-            <option value="user">Usuario</option>
-            <option value="organization_admin">Admin de Organización</option>
-            <option value="app_admin">Administrador</option>
+            <option value="user">{t('regularUser')}</option>
+            <option value="organization_admin">{t('organizationAdmin')}</option>
+            <option value="app_admin">{t('appAdmin')}</option>
           </select>
         </div>
       </div>
@@ -347,7 +354,7 @@ export function UserForm({ user }: { user?: UserType }) {
       {!isEditing && (
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="status">Estado *</Label>
+            <Label htmlFor="status">{t('status')} *</Label>
             <select
               id="status"
               name="status"
@@ -355,8 +362,8 @@ export function UserForm({ user }: { user?: UserType }) {
               required
               className="flex h-11 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-highlight focus-visible:ring-offset-2"
             >
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
+              <option value="active">{common('active')}</option>
+              <option value="inactive">{common('inactive')}</option>
             </select>
           </div>
           <div /> {/* Empty space for grid alignment */}
@@ -365,14 +372,14 @@ export function UserForm({ user }: { user?: UserType }) {
 
       {/* Address */}
       <div className="space-y-2">
-        <Label htmlFor="address">Dirección</Label>
+        <Label htmlFor="address">{t('address')}</Label>
         <div className="relative">
           <MapPin className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
           <textarea
             id="address"
             name="address"
             rows={2}
-            placeholder="Calle, número, colonia, ciudad..."
+            placeholder={t('addressPlaceholder')}
             defaultValue={user?.address ?? ''}
             className="flex w-full rounded-md border border-neutral-200 bg-white pl-10 pr-3 py-2 text-sm ring-offset-white placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-highlight focus-visible:ring-offset-2"
           />
@@ -382,7 +389,7 @@ export function UserForm({ user }: { user?: UserType }) {
       {/* Actions */}
       <div className="flex items-center justify-end gap-3 border-t border-neutral-100 pt-6">
         <Button type="button" variant="outline" onClick={() => router.back()} disabled={loading}>
-          Cancelar
+          {common('cancel')}
         </Button>
         <Button
           type="submit"
@@ -392,12 +399,12 @@ export function UserForm({ user }: { user?: UserType }) {
           {loading || uploadingAvatar ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {uploadingAvatar ? 'Subiendo foto...' : isEditing ? 'Guardando...' : 'Creando...'}
+              {uploadingAvatar ? t('uploadingPhoto') : isEditing ? t('updating') : t('creating')}
             </>
           ) : isEditing ? (
-            'Guardar Cambios'
+            t('updateSubmit')
           ) : (
-            'Crear Usuario'
+            t('createSubmit')
           )}
         </Button>
       </div>

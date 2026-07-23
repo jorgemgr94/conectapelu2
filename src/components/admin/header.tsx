@@ -1,10 +1,14 @@
 import { Bell, Command, Search } from 'lucide-react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import type { User } from '@/app/actions/users';
 import { Button } from '@/components/ui/button';
+import { LocaleSwitcher } from '@/components/ui/locale-switcher';
 import { getUserDisplayName, getUserInitials } from '@/lib/utils';
 
 export function Header({ user }: { user: User }) {
+  const common = useTranslations('Common');
+  const t = useTranslations('AdminHeader');
   const displayName = getUserDisplayName(user);
   const initials = getUserInitials(user);
 
@@ -17,7 +21,7 @@ export function Header({ user }: { user: User }) {
           </div>
           <input
             type="search"
-            placeholder="Buscar..."
+            placeholder={t('searchPlaceholder')}
             className="h-11 w-full rounded-xl border border-neutral-200 bg-neutral-50/50 pl-11 pr-20 text-sm text-neutral-900 placeholder:text-neutral-400 transition-all focus:border-primary-highlight focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-highlight/10"
           />
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -29,10 +33,12 @@ export function Header({ user }: { user: User }) {
       </div>
 
       <div className="flex items-center gap-4">
+        <LocaleSwitcher />
         <Button
           variant="ghost"
           size="icon"
           className="relative h-11 w-11 rounded-xl text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
+          aria-label={t('notifications')}
         >
           <Bell className="h-5 w-5" />
           <span className="absolute right-2.5 top-2.5 flex h-2 w-2">
@@ -63,7 +69,7 @@ export function Header({ user }: { user: User }) {
           <div className="hidden lg:block">
             <p className="text-sm font-semibold text-neutral-900">{displayName}</p>
             <p className="text-xs text-neutral-500">
-              {user.role === 'app_admin' ? 'Administrador' : 'Usuario'}
+              {user.role === 'app_admin' ? common('administrator') : common('user')}
             </p>
           </div>
         </div>

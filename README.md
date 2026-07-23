@@ -11,6 +11,7 @@ PostgreSQL, Drizzle, and Supabase.
 - Tailwind CSS 4 and shadcn-style UI primitives
 - PostgreSQL with Drizzle ORM
 - Supabase Auth, Storage, and optional Realtime
+- `next-intl` with Mexican Spanish and US English
 - Biome, Vitest, and GitHub Actions
 
 ## Requirements
@@ -55,6 +56,15 @@ pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## Localization
+
+User-facing copy lives in `messages/es-MX.json` and `messages/en-US.json`. Mexican Spanish is the
+default locale. The language selector stores the preference in the `conectapelu2_locale` cookie,
+so routes remain unchanged when users switch languages.
+
+Add every new message to both catalogs. The test suite checks that their key structures remain
+equivalent.
 
 ## Environment variables
 

@@ -1,13 +1,22 @@
 import { ArrowRight, Building2, Cat, Dog, Heart, PawPrint, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { getPetsCount, getRandomPets } from '@/app/actions/pets';
 import { PublicFooter, PublicHeader } from '@/components/public';
 import { Button } from '@/components/ui/button';
-import { calculatePetAge } from '@/lib/pets';
+import { getPetAge } from '@/lib/pets';
 
 export default async function HomePage() {
+  const [common, t] = await Promise.all([getTranslations('Common'), getTranslations('Home')]);
   const [featuredPets, totalCount] = await Promise.all([getRandomPets(6), getPetsCount()]);
+  const formatAge = (birthDate: Date | string | null | undefined) => {
+    const age = getPetAge(birthDate);
+    if (!age) return common('pet.unknownAge');
+    return age.unit === 'month'
+      ? common('pet.month', { count: age.count })
+      : common('pet.year', { count: age.count });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-dark-page">
@@ -22,9 +31,9 @@ export default async function HomePage() {
         <div className="relative z-10">
           <div className="mx-auto max-w-4xl px-6 text-center">
             <h1 className="text-4xl font-bold leading-tight text-white lg:text-6xl">
-              Peludos esperando por su hogar{' '}
+              {t('heroTitle')}{' '}
               <span className="relative">
-                <span className="text-primary-highlight">para siempre</span>
+                <span className="text-primary-highlight">{t('heroHighlight')}</span>
                 <svg
                   className="absolute -bottom-2 left-0 w-full text-primary-highlight/40"
                   height="8"
@@ -69,7 +78,7 @@ export default async function HomePage() {
                     <div className="absolute bottom-2 left-2 right-2">
                       <p className="font-semibold text-white">{pet.name}</p>
                       <p className="text-xs text-neutral-300">
-                        {pet.breed} · {calculatePetAge(pet.birthDate)}
+                        {pet.breed} · {formatAge(pet.birthDate)}
                       </p>
                     </div>
                   </div>
@@ -84,50 +93,44 @@ export default async function HomePage() {
                   className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:border-primary-highlight/50 hover:bg-primary-highlight/10 hover:text-white"
                 >
                   <Dog className="h-4 w-4" />
-                  Perritos
+                  {t('dogs')}
                 </Link>
                 <Link
                   href="/pets?type=cat"
                   className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:border-primary-highlight/50 hover:bg-primary-highlight/10 hover:text-white"
                 >
                   <Cat className="h-4 w-4" />
-                  Gatitos
+                  {t('cats')}
                 </Link>
                 <Link
                   href="/pets?size=small"
                   className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:border-primary-highlight/50 hover:bg-primary-highlight/10 hover:text-white"
                 >
                   <PawPrint className="h-4 w-4" />
-                  Pequeño
+                  {t('small')}
                 </Link>
                 <Link
                   href="/pets?size=medium"
                   className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-neutral-300 transition-all hover:border-primary-highlight/50 hover:bg-primary-highlight/10 hover:text-white"
                 >
                   <PawPrint className="h-4 w-4" />
-                  Mediano
+                  {t('medium')}
                 </Link>
                 <Link
                   href="/pets"
                   className="flex items-center gap-2 rounded-full border border-primary-highlight/30 bg-primary-highlight/10 px-5 py-2.5 text-sm font-medium text-primary-highlight transition-all hover:bg-primary-highlight/20 hover:text-white"
                 >
-                  Ver todos
+                  {t('viewAll')}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-500 lg:gap-8">
-                <span>
-                  <strong className="text-white">{totalCount}</strong> peludos disponibles
-                </span>
+                <span>{t('availablePets', { count: totalCount })}</span>
                 <span className="hidden sm:inline">•</span>
-                <span>
-                  <strong className="text-white">24</strong> organizaciones
-                </span>
+                <span>{t('organizations', { count: 24 })}</span>
                 <span className="hidden sm:inline">•</span>
-                <span>
-                  <strong className="text-white">892</strong> adopciones felices
-                </span>
+                <span>{t('happyAdoptions', { count: 892 })}</span>
               </div>
             </div>
           </div>
@@ -140,38 +143,27 @@ export default async function HomePage() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full bg-primary-brand/20 px-4 py-2 text-sm font-medium text-primary-highlight mb-4">
                 <Heart className="h-4 w-4" />
-                Nuestra Misión
+                {t('mission')}
               </span>
-              <h2 className="text-3xl font-bold text-white lg:text-4xl mb-4">
-                ¿Por qué <span className="text-primary-highlight">ConectaPelu2</span>?
-              </h2>
-              <p className="text-neutral-400 mb-4">
-                El <span className="text-primary-highlight font-semibold">"2"</span> en nuestro
-                nombre representa la conexión entre{' '}
-                <span className="text-primary-highlight">dos mundos</span>: los peludos que buscan
-                una familia y las personas que tienen amor para dar.
-              </p>
-              <p className="text-neutral-400">
-                Cada día, cientos de gatitos y perritos esperan en refugios por alguien que los
-                elija. Nosotros facilitamos ese encuentro mágico donde dos destinos se conectan para
-                siempre.
-              </p>
+              <h2 className="text-3xl font-bold text-white lg:text-4xl mb-4">{t('why')}</h2>
+              <p className="text-neutral-400 mb-4">{t('missionDescription')}</p>
+              <p className="text-neutral-400">{t('missionDescriptionTwo')}</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl bg-primary-brand/10 p-5 text-center">
                 <span className="text-3xl mb-2 block">🐱</span>
                 <p className="text-xl font-bold text-white">234</p>
-                <p className="text-sm text-neutral-400">Gatitos</p>
+                <p className="text-sm text-neutral-400">{t('cats')}</p>
               </div>
               <div className="rounded-2xl bg-primary-brand/10 p-5 text-center">
                 <span className="text-3xl mb-2 block">🐶</span>
                 <p className="text-xl font-bold text-white">312</p>
-                <p className="text-sm text-neutral-400">Perritos</p>
+                <p className="text-sm text-neutral-400">{t('dogs')}</p>
               </div>
               <div className="col-span-2 rounded-2xl bg-primary-brand/10 p-5 text-center">
                 <span className="text-3xl mb-2 block">💜</span>
                 <p className="text-xl font-bold text-white">892</p>
-                <p className="text-sm text-neutral-400">Historias de amor completadas</p>
+                <p className="text-sm text-neutral-400">{t('loveStories')}</p>
               </div>
             </div>
           </div>
@@ -211,15 +203,13 @@ export default async function HomePage() {
                 <div className="flex-1">
                   <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-sm font-medium text-white/90 mb-4">
                     <Building2 className="h-4 w-4" />
-                    Para Organizaciones
+                    {t('forOrganizations')}
                   </span>
                   <h2 className="text-3xl font-bold text-white lg:text-4xl">
-                    ¿Tienes una organización de rescate?
+                    {t('organizationTitle')}
                   </h2>
                   <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80 lg:mx-0">
-                    Únete a ConectaPelu2 y ayuda a más peludos a encontrar su hogar. Nuestra
-                    plataforma te permite gestionar adopciones, mostrar tus rescatados y conectar
-                    con familias adoptantes de forma fácil y segura.
+                    {t('organizationDescription')}
                   </p>
 
                   <div className="mt-6 flex flex-wrap justify-center gap-4 lg:justify-start">
@@ -227,19 +217,19 @@ export default async function HomePage() {
                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
                         <PawPrint className="h-3 w-3" />
                       </div>
-                      Gestión de peludos
+                      {t('petManagement')}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-white/80">
                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
                         <Users className="h-3 w-3" />
                       </div>
-                      Equipo colaborativo
+                      {t('collaborativeTeam')}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-white/80">
                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
                         <Heart className="h-3 w-3" />
                       </div>
-                      Seguimiento de adopciones
+                      {t('adoptionTracking')}
                     </div>
                   </div>
 
@@ -250,11 +240,11 @@ export default async function HomePage() {
                       className="h-12 px-8 bg-white text-primary-brand font-semibold hover:bg-white/90 shadow-xl"
                     >
                       <Link href="/login">
-                        Registrar mi Organización
+                        {t('registerOrganization')}
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
                     </Button>
-                    <span className="text-sm text-white/60">Es gratis y toma solo 2 minutos</span>
+                    <span className="text-sm text-white/60">{t('freeAndQuick')}</span>
                   </div>
                 </div>
               </div>

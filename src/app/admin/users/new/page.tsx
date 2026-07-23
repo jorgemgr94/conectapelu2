@@ -1,8 +1,11 @@
 import { ArrowLeft, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { UserForm } from '@/components/admin/user-form';
 
 export default function NewUserPage() {
+  const t = useTranslations('Users');
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -18,8 +21,8 @@ export default function NewUserPage() {
             <UserPlus className="h-7 w-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Nuevo Usuario</h1>
-            <p className="text-sm text-neutral-500">Crea una nueva cuenta de usuario</p>
+            <h1 className="text-2xl font-bold text-neutral-900">{t('new')}</h1>
+            <p className="text-sm text-neutral-500">{t('newSubtitle')}</p>
           </div>
         </div>
       </div>

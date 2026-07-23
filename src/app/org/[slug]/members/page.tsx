@@ -11,6 +11,7 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import {
   getOrganizationBySlug,
   getOrganizationMembersBySlug,
@@ -25,6 +26,11 @@ interface MembersPageProps {
 export default async function MembersPage({ params, searchParams }: MembersPageProps) {
   const { slug } = await params;
   const { search, role } = await searchParams;
+  const [common, t, format] = await Promise.all([
+    getTranslations('Common'),
+    getTranslations('OrgMembers'),
+    getFormatter(),
+  ]);
 
   const organization = await getOrganizationBySlug(slug);
   let members = await getOrganizationMembersBySlug(slug);
@@ -67,11 +73,11 @@ export default async function MembersPage({ params, searchParams }: MembersPageP
   const getRoleLabel = (memberRole: string) => {
     switch (memberRole) {
       case 'org_admin':
-        return 'Admin';
+        return t('admin');
       case 'reviewer':
-        return 'Reviewer';
+        return t('reviewer');
       case 'member':
-        return 'Member';
+        return t('memberRole');
       default:
         return memberRole;
     }
@@ -97,9 +103,11 @@ export default async function MembersPage({ params, searchParams }: MembersPageP
             <Users className="h-7 w-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Team Members</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
             <p className="text-sm text-slate-500">
-              Manage {organization?.name || 'organization'} members and roles
+              {t('organizationSubtitle', {
+                organization: organization?.name || common('organization'),
+              })}
             </p>
           </div>
         </div>
@@ -109,7 +117,7 @@ export default async function MembersPage({ params, searchParams }: MembersPageP
         >
           <Link href={`/org/${slug}/members/invite`}>
             <Plus className="mr-2 h-4 w-4" />
-            Invite Member
+            {t('invite')}
           </Link>
         </Button>
       </div>
@@ -125,7 +133,7 @@ export default async function MembersPage({ params, searchParams }: MembersPageP
                 type="search"
                 name="search"
                 defaultValue={search}
-                placeholder="Search members..."
+                placeholder={t('searchPlaceholder')}
                 className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition-all focus:border-emerald-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
               />
             </form>
@@ -134,10 +142,10 @@ export default async function MembersPage({ params, searchParams }: MembersPageP
           {/* Role Filter Pills */}
           <div className="hidden items-center gap-2 lg:flex">
             {[
-              { value: '', label: 'All', count: roleCounts.all },
-              { value: 'org_admin', label: 'Admins', count: roleCounts.org_admin },
-              { value: 'reviewer', label: 'Reviewers', count: roleCounts.reviewer },
-              { value: 'member', label: 'Members', count: roleCounts.member },
+              { value: '', label: common('all'), count: roleCounts.all },
+              { value: 'org_admin', label: t('admins'), count: roleCounts.org_admin },
+              { value: 'reviewer', label: t('reviewers'), count: roleCounts.reviewer },
+              { value: 'member', label: t('membersPlural'), count: roleCounts.member },
             ].map((option) => (
               <Link
                 key={option.value}
@@ -166,7 +174,7 @@ export default async function MembersPage({ params, searchParams }: MembersPageP
         {/* Mobile Filter */}
         <Button variant="outline" className="gap-2 lg:hidden">
           <Filter className="h-4 w-4" />
-          Filter
+          {t('filter')}
         </Button>
       </div>
 
@@ -176,17 +184,15 @@ export default async function MembersPage({ params, searchParams }: MembersPageP
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
             <Users className="h-8 w-8 text-slate-400" />
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-slate-900">No members found</h3>
+          <h3 className="mt-4 text-lg font-semibold text-slate-900">{t('empty')}</h3>
           <p className="mt-1 text-sm text-slate-500">
-            {search || role
-              ? 'Try adjusting your filters'
-              : 'Start by inviting your first team member'}
+            {search || role ? t('adjustFilters') : t('none')}
           </p>
           {!search && !role && (
             <Button asChild className="mt-4" variant="outline">
               <Link href={`/org/${slug}/members/invite`}>
                 <Plus className="mr-2 h-4 w-4" />
-                Invite Member
+                {t('invite')}
               </Link>
             </Button>
           )}
@@ -225,11 +231,11 @@ export default async function MembersPage({ params, searchParams }: MembersPageP
                     <h3 className="font-semibold text-slate-900 truncate">
                       {member.user?.firstName && member.user?.lastName
                         ? `${member.user.firstName} ${member.user.lastName}`
-                        : member.user?.email?.split('@')[0] || 'Unknown'}
+                        : member.user?.email?.split('@')[0] || t('unknown')}
                     </h3>
                     <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
                       <Mail className="h-3.5 w-3.5" />
-                      <span className="truncate">{member.user?.email || 'No email'}</span>
+                      <span className="truncate">{member.user?.email || common('noEmail')}</span>
                     </div>
                   </div>
                 </div>
@@ -239,11 +245,10 @@ export default async function MembersPage({ params, searchParams }: MembersPageP
                   <div className="flex items-center gap-1.5 text-xs text-slate-400">
                     <Calendar className="h-3.5 w-3.5" />
                     <span>
-                      Joined{' '}
-                      {new Date(member.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
+                      {t('joinedOn', {
+                        date: format.dateTime(new Date(member.createdAt), {
+                          dateStyle: 'medium',
+                        }),
                       })}
                     </span>
                   </div>

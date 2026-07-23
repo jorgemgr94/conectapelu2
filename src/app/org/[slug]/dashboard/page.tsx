@@ -10,42 +10,48 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import { getOrganizationBySlug } from '@/app/actions/organization-members';
 import { Button } from '@/components/ui/button';
 
 export default async function OrgDashboardPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const organization = await getOrganizationBySlug(slug);
+  const [common, t, format] = await Promise.all([
+    getTranslations('Common'),
+    getTranslations('OrgDashboard'),
+    getFormatter(),
+  ]);
 
   const stats = [
     {
-      name: 'Total Peludos',
+      name: t('totalPets'),
       value: '24',
-      change: '+3 esta semana',
+      change: t('addedThisWeek', { count: 3 }),
       icon: PawPrint,
       gradient: 'bg-linear-to-br from-secondary-highlight to-secondary-highlight-dark',
       bgGradient: 'from-secondary-highlight/10 to-secondary-highlight/5',
     },
     {
-      name: 'Adopciones',
+      name: t('adoptions'),
       value: '18',
-      change: '+5 este mes',
+      change: t('addedThisMonth', { count: 5 }),
       icon: Heart,
       gradient: 'bg-linear-to-br from-error to-error-dark',
       bgGradient: 'from-error/10 to-error/5',
     },
     {
-      name: 'Miembros',
+      name: t('members'),
       value: '6',
-      change: '+1 nuevo',
+      change: t('newCount', { count: 1 }),
       icon: Users,
       gradient: 'bg-gradient-brand',
       bgGradient: 'from-primary-brand/10 to-primary-highlight/5',
     },
     {
-      name: 'Solicitudes',
+      name: t('requests'),
       value: '12',
-      change: '8 pendientes',
+      change: t('pendingCount', { count: 8 }),
       icon: TrendingUp,
       gradient: 'bg-gradient-tertiary',
       bgGradient: 'from-tertiary-highlight/10 to-tertiary-highlight/5',
@@ -56,45 +62,45 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
     {
       id: 1,
       name: 'Luna',
-      type: 'Perrito',
+      type: 'dog',
       breed: 'Golden Retriever',
       status: 'available',
-      age: '2 años',
+      age: 2,
       image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=200&h=200&fit=crop',
     },
     {
       id: 2,
       name: 'Max',
-      type: 'Perrito',
+      type: 'dog',
       breed: 'Labrador',
       status: 'pending',
-      age: '3 años',
+      age: 3,
       image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=200&h=200&fit=crop',
     },
     {
       id: 3,
       name: 'Michi',
-      type: 'Gatito',
+      type: 'cat',
       breed: 'Siamés',
       status: 'available',
-      age: '1 año',
+      age: 1,
       image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200&h=200&fit=crop',
     },
     {
       id: 4,
       name: 'Rocky',
-      type: 'Perrito',
+      type: 'dog',
       breed: 'Pastor Alemán',
       status: 'adopted',
-      age: '4 años',
+      age: 4,
       image: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=200&h=200&fit=crop',
     },
   ];
 
   const pendingApplications = [
-    { id: 1, applicant: 'María García', pet: 'Luna', time: 'hace 2h', avatar: 'MG' },
-    { id: 2, applicant: 'Carlos López', pet: 'Max', time: 'hace 5h', avatar: 'CL' },
-    { id: 3, applicant: 'Ana Martínez', pet: 'Michi', time: 'hace 1d', avatar: 'AM' },
+    { id: 1, applicant: 'María García', pet: 'Luna', hours: 2, avatar: 'MG' },
+    { id: 2, applicant: 'Carlos López', pet: 'Max', hours: 5, avatar: 'CL' },
+    { id: 3, applicant: 'Ana Martínez', pet: 'Michi', days: 1, avatar: 'AM' },
   ];
 
   return (
@@ -107,20 +113,18 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
           <div>
             <div className="mb-2 flex items-center gap-2">
               <PawPrint className="h-5 w-5 text-tertiary-highlight" />
-              <span className="text-sm font-medium text-tertiary-highlight">
-                Portal de Organización
-              </span>
+              <span className="text-sm font-medium text-tertiary-highlight">{t('portal')}</span>
             </div>
             <h1 className="mb-2 text-3xl font-bold text-white">
-              {organization?.name || 'Tu Organización'}
+              {organization?.name || t('organizationFallback')}
             </h1>
-            <p className="text-neutral-400">Gestiona tus peludos, solicitudes y equipo.</p>
+            <p className="text-neutral-400">{t('subtitle')}</p>
           </div>
           <div className="hidden items-center gap-3 lg:flex">
             <div className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm">
               <Calendar className="h-4 w-4 text-neutral-400" />
               <span>
-                {new Date().toLocaleDateString('es-ES', {
+                {format.dateTime(new Date(), {
                   weekday: 'long',
                   month: 'short',
                   day: 'numeric',
@@ -130,7 +134,7 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
             <Button className="bg-gradient-tertiary text-white hover:opacity-90" asChild>
               <Link href={`/org/${slug}/pets/new`}>
                 <Plus className="mr-2 h-4 w-4" />
-                Agregar Peludo
+                {t('addPet')}
               </Link>
             </Button>
           </div>
@@ -170,11 +174,11 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
           <div className="overflow-hidden rounded-2xl border border-neutral-200/50 bg-white">
             <div className="flex items-center justify-between border-b border-neutral-100 p-6">
               <div>
-                <h2 className="text-lg font-semibold text-neutral-900">Tus Peludos</h2>
-                <p className="text-sm text-neutral-500">Peludos listados recientemente</p>
+                <h2 className="text-lg font-semibold text-neutral-900">{t('yourPets')}</h2>
+                <p className="text-sm text-neutral-500">{t('recentPets')}</p>
               </div>
               <Button variant="ghost" size="sm" asChild>
-                <Link href={`/org/${slug}/pets`}>Ver todos</Link>
+                <Link href={`/org/${slug}/pets`}>{t('viewAll')}</Link>
               </Button>
             </div>
             <div className="grid gap-4 p-6 sm:grid-cols-2">
@@ -205,14 +209,17 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
                         }`}
                       >
                         {pet.status === 'available'
-                          ? 'Disponible'
+                          ? common('status.available')
                           : pet.status === 'pending'
-                            ? 'En proceso'
-                            : 'Adoptado'}
+                            ? common('status.pending')
+                            : common('status.adopted')}
                       </span>
                     </div>
                     <p className="text-sm text-neutral-500">{pet.breed}</p>
-                    <p className="text-xs text-neutral-400">{pet.age}</p>
+                    <p className="text-xs text-neutral-400">
+                      {pet.type === 'dog' ? common('pet.dog') : common('pet.cat')} ·{' '}
+                      {common('pet.year', { count: pet.age })}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -223,12 +230,12 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
         <div className="overflow-hidden rounded-2xl border border-neutral-200/50 bg-white">
           <div className="border-b border-neutral-100 p-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-neutral-900">Solicitudes Pendientes</h2>
+              <h2 className="text-lg font-semibold text-neutral-900">{t('pendingRequests')}</h2>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-tertiary-highlight text-xs font-bold text-white">
                 {pendingApplications.length}
               </span>
             </div>
-            <p className="text-sm text-neutral-500">Revisa las solicitudes de adopción</p>
+            <p className="text-sm text-neutral-500">{t('reviewRequests')}</p>
           </div>
           <div className="divide-y divide-neutral-100">
             {pendingApplications.map((app) => (
@@ -240,13 +247,19 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
                   <div className="flex-1">
                     <p className="font-medium text-neutral-900">{app.applicant}</p>
                     <p className="text-sm text-neutral-500">
-                      Quiere adoptar a{' '}
-                      <span className="font-medium text-tertiary-highlight-dark">{app.pet}</span>
+                      {t.rich('wantsToAdopt', {
+                        name: app.pet,
+                        strong: (chunks) => (
+                          <span className="font-medium text-tertiary-highlight-dark">{chunks}</span>
+                        ),
+                      })}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-xs text-neutral-400">
                     <Clock className="h-3 w-3" />
-                    {app.time}
+                    {'hours' in app
+                      ? t('hoursAgo', { count: app.hours ?? 0 })
+                      : t('daysAgo', { count: app.days ?? 0 })}
                   </div>
                 </div>
               </div>
@@ -254,7 +267,7 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
           </div>
           <div className="border-t border-neutral-100 p-4">
             <Button variant="ghost" className="w-full text-sm" asChild>
-              <Link href={`/org/${slug}/adoptions`}>Ver todas las solicitudes</Link>
+              <Link href={`/org/${slug}/adoptions`}>{t('viewAllRequests')}</Link>
             </Button>
           </div>
         </div>
@@ -269,8 +282,8 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
             <Plus className="h-6 w-6 text-white" />
           </div>
           <div>
-            <p className="font-semibold text-neutral-900">Agregar Peludo</p>
-            <p className="text-sm text-neutral-500">Listar para adopción</p>
+            <p className="font-semibold text-neutral-900">{t('addPet')}</p>
+            <p className="text-sm text-neutral-500">{t('listForAdoption')}</p>
           </div>
         </Link>
 
@@ -282,8 +295,8 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
             <Users className="h-6 w-6 text-white" />
           </div>
           <div>
-            <p className="font-semibold text-neutral-900">Invitar Miembro</p>
-            <p className="text-sm text-neutral-500">Agregar al equipo</p>
+            <p className="font-semibold text-neutral-900">{t('inviteMember')}</p>
+            <p className="text-sm text-neutral-500">{t('addToTeam')}</p>
           </div>
         </Link>
 
@@ -295,8 +308,8 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
             <Heart className="h-6 w-6 text-white" />
           </div>
           <div>
-            <p className="font-semibold text-neutral-900">Solicitudes</p>
-            <p className="text-sm text-neutral-500">Revisar pedidos</p>
+            <p className="font-semibold text-neutral-900">{t('requests')}</p>
+            <p className="text-sm text-neutral-500">{t('reviewApplications')}</p>
           </div>
         </Link>
 
@@ -308,8 +321,8 @@ export default async function OrgDashboardPage({ params }: { params: Promise<{ s
             <PawPrint className="h-6 w-6 text-white" />
           </div>
           <div>
-            <p className="font-semibold text-neutral-900">Configuración</p>
-            <p className="text-sm text-neutral-500">Configurar org</p>
+            <p className="font-semibold text-neutral-900">{t('settings')}</p>
+            <p className="text-sm text-neutral-500">{t('organizationSettings')}</p>
           </div>
         </Link>
       </div>

@@ -11,18 +11,11 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { getAvailableCities, getCountsBySpecies, getPets } from '@/app/actions/pets';
 import { PublicFooter, PublicHeader } from '@/components/public';
 import { Button } from '@/components/ui/button';
-import {
-  calculatePetAge,
-  getSexLabel,
-  getSizeLabel,
-  getSpeciesLabel,
-  type PetFilters,
-  type PetSize,
-  type PetSpecies,
-} from '@/lib/pets';
+import { getPetAge, type PetFilters, type PetSize, type PetSpecies } from '@/lib/pets';
 
 interface PetsPageProps {
   searchParams: Promise<{
@@ -35,6 +28,7 @@ interface PetsPageProps {
 }
 
 export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
+  const [common, t] = await Promise.all([getTranslations('Common'), getTranslations('Pets')]);
   const params = await searchParams;
 
   const filters: PetFilters = {};
@@ -63,17 +57,43 @@ export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
   const { data: pets, pagination } = petsResult;
 
   const petTypes = [
-    { name: 'Todos', icon: Heart, value: '', count: speciesCounts.dog + speciesCounts.cat },
-    { name: 'Perritos', icon: Dog, value: 'dog', count: speciesCounts.dog },
-    { name: 'Gatitos', icon: Cat, value: 'cat', count: speciesCounts.cat },
+    { name: t('all'), icon: Heart, value: '', count: speciesCounts.dog + speciesCounts.cat },
+    { name: t('dogs'), icon: Dog, value: 'dog', count: speciesCounts.dog },
+    { name: t('cats'), icon: Cat, value: 'cat', count: speciesCounts.cat },
   ];
 
   const sizeFilters: Array<{ label: string; value: PetSize }> = [
-    { label: 'Pequeño', value: 'small' },
-    { label: 'Mediano', value: 'medium' },
-    { label: 'Grande', value: 'large' },
-    { label: 'Extra Grande', value: 'extra_large' },
+    { label: common('pet.small'), value: 'small' },
+    { label: common('pet.medium'), value: 'medium' },
+    { label: common('pet.large'), value: 'large' },
+    { label: common('pet.extraLarge'), value: 'extra_large' },
   ];
+
+  const formatAge = (birthDate: Date | string | null | undefined) => {
+    const age = getPetAge(birthDate);
+    if (!age) return common('pet.unknownAge');
+    return age.unit === 'month'
+      ? common('pet.month', { count: age.count })
+      : common('pet.year', { count: age.count });
+  };
+
+  const getSpeciesLabel = (species: string) =>
+    species === 'dog' ? common('pet.dog') : common('pet.cat');
+  const getSexLabel = (sex: string) =>
+    sex === 'male'
+      ? common('pet.male')
+      : sex === 'female'
+        ? common('pet.female')
+        : common('pet.unknownSex');
+  const getSizeLabel = (size: string) => {
+    const sizeKeys = {
+      small: 'pet.small',
+      medium: 'pet.medium',
+      large: 'pet.large',
+      extra_large: 'pet.extraLarge',
+    } as const;
+    return common(sizeKeys[size as keyof typeof sizeKeys] ?? 'pet.unknownAge');
+  };
 
   const buildUrl = (updates: Record<string, string | undefined>) => {
     const newParams = new URLSearchParams();
@@ -103,7 +123,7 @@ export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
                 type="text"
                 name="search"
                 defaultValue={params.search}
-                placeholder="Buscar por raza, nombre o ubicación..."
+                placeholder={t('searchPlaceholder')}
                 className="h-12 w-full rounded-xl border border-white/10 bg-white/5 pl-12 pr-4 text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-highlight/50"
               />
             </div>
@@ -114,7 +134,7 @@ export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
                 defaultValue={params.city}
                 className="h-12 w-full appearance-none rounded-xl border border-white/10 bg-white/5 pl-12 pr-10 text-white focus:outline-none focus:ring-2 focus:ring-primary-highlight/50"
               >
-                <option value="">Todas las ciudades</option>
+                <option value="">{t('allCities')}</option>
                 {availableCities.map((city) => (
                   <option key={city.id} value={city.id}>
                     {city.name} ({city.count})
@@ -130,7 +150,7 @@ export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
               className="h-12 bg-gradient-brand px-6 text-white hover:opacity-90"
             >
               <Search className="mr-2 h-4 w-4" />
-              Buscar
+              {common('search')}
             </Button>
           </form>
 
@@ -186,20 +206,23 @@ export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
                 className="text-neutral-400 hover:bg-white/5 hover:text-white"
               >
                 <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Más filtros
+                {t('moreFilters')}
               </Button>
             </div>
           </div>
 
           <div className="mt-4 flex items-center gap-6 text-sm text-neutral-500">
-            <span>{pagination.total} peludos encontrados</span>
+            <span>{t('found', { count: pagination.total })}</span>
             <span>•</span>
-            <span>{availableCities.length} ciudades</span>
+            <span>{t('cities', { count: availableCities.length })}</span>
             {pagination.totalPages > 1 && (
               <>
                 <span>•</span>
                 <span>
-                  Página {pagination.page} de {pagination.totalPages}
+                  {common('pageOf', {
+                    page: pagination.page,
+                    totalPages: pagination.totalPages,
+                  })}
                 </span>
               </>
             )}
@@ -214,16 +237,14 @@ export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5">
                 <Search className="h-8 w-8 text-neutral-500" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-white">No se encontraron peludos</h3>
-              <p className="mt-1 text-sm text-neutral-500">
-                Intenta ajustar los filtros de búsqueda
-              </p>
+              <h3 className="mt-4 text-lg font-semibold text-white">{t('emptyTitle')}</h3>
+              <p className="mt-1 text-sm text-neutral-500">{t('emptyDescription')}</p>
               <Button
                 asChild
                 variant="outline"
                 className="mt-4 border-white/10 text-white hover:bg-white/5"
               >
-                <Link href="/pets">Ver todos los peludos</Link>
+                <Link href="/pets">{t('viewAllPets')}</Link>
               </Button>
             </div>
           ) : (
@@ -276,7 +297,7 @@ export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
                           {pet.breed}
                         </span>
                         <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-neutral-400">
-                          {calculatePetAge(pet.birthDate)}
+                          {formatAge(pet.birthDate)}
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-1">
@@ -292,7 +313,7 @@ export default async function PublicPetsPage({ searchParams }: PetsPageProps) {
                           {pet.organizationName}
                         </span>
                         <span className="whitespace-nowrap text-xs font-medium text-primary-highlight group-hover:text-primary-highlight-light">
-                          Ver →
+                          {t('view')}
                         </span>
                       </div>
                     </div>

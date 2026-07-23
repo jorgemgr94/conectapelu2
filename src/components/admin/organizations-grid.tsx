@@ -1,5 +1,6 @@
 import { Building2, Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { useFormatter, useTranslations } from 'next-intl';
 import type { Organization } from '@/app/actions/organizations';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
@@ -12,6 +13,8 @@ interface OrganizationsGridProps {
 }
 
 export function OrganizationsGrid({ data, hasFilters = false }: OrganizationsGridProps) {
+  const format = useFormatter();
+  const t = useTranslations('Organizations');
   const { data: organizations, pagination } = data;
 
   if (organizations.length === 0) {
@@ -20,17 +23,15 @@ export function OrganizationsGrid({ data, hasFilters = false }: OrganizationsGri
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
           <Building2 className="h-8 w-8 text-neutral-400" />
         </div>
-        <h3 className="mt-4 text-lg font-semibold text-neutral-900">
-          No se encontraron organizaciones
-        </h3>
+        <h3 className="mt-4 text-lg font-semibold text-neutral-900">{t('empty')}</h3>
         <p className="mt-1 text-sm text-neutral-500">
-          {hasFilters ? 'Intenta ajustar los filtros' : 'Comienza creando tu primera organización'}
+          {hasFilters ? t('adjustFilters') : t('createFirst')}
         </p>
         {!hasFilters && (
           <Button asChild className="mt-4" variant="outline">
             <Link href="/admin/organizations/new">
               <Plus className="mr-2 h-4 w-4" />
-              Crear Organización
+              {t('create')}
             </Link>
           </Button>
         )}
@@ -58,10 +59,10 @@ export function OrganizationsGrid({ data, hasFilters = false }: OrganizationsGri
                 }`}
               >
                 {org.status === 'active'
-                  ? 'Activa'
+                  ? t('active')
                   : org.status === 'pending'
-                    ? 'Pendiente'
-                    : 'Suspendida'}
+                    ? t('pending')
+                    : t('suspended')}
               </span>
             </div>
 
@@ -80,11 +81,12 @@ export function OrganizationsGrid({ data, hasFilters = false }: OrganizationsGri
 
             <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-4">
               <span className="text-xs text-neutral-400">
-                Creada el{' '}
-                {new Date(org.createdAt).toLocaleDateString('es-ES', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
+                {t('createdOn', {
+                  date: format.dateTime(new Date(org.createdAt), {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  }),
                 })}
               </span>
               <div className="flex items-center gap-1">
@@ -129,7 +131,7 @@ export function OrganizationsGrid({ data, hasFilters = false }: OrganizationsGri
         baseUrl="/admin/organizations"
         total={pagination.total}
         limit={pagination.limit}
-        itemLabel="organizaciones"
+        itemLabel={t('items')}
       />
     </div>
   );

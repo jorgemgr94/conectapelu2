@@ -1,5 +1,6 @@
 import { Building2, Filter, Plus, Search } from 'lucide-react';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import type { Organization } from '@/app/actions/organizations';
 import { getOrganizations } from '@/app/actions/organizations';
 import { OrganizationsGrid } from '@/components/admin';
@@ -12,6 +13,7 @@ export default async function OrganizationsPage({
 }: {
   searchParams: Promise<{ search?: string; status?: string; page?: string }>;
 }) {
+  const t = await getTranslations('Organizations');
   const { search, status, page } = await searchParams;
   const currentPage = Math.max(1, Number(page) || 1);
 
@@ -51,17 +53,19 @@ export default async function OrganizationsPage({
             <Building2 className="h-7 w-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Organizaciones</h1>
+            <h1 className="text-2xl font-bold text-neutral-900">{t('title')}</h1>
             <p className="text-sm text-neutral-500">
-              Gestiona organizaciones de rescate y refugios
-              <span className="ml-2 text-neutral-400">({result.pagination.total} total)</span>
+              {t('subtitle')}
+              <span className="ml-2 text-neutral-400">
+                {t('total', { count: result.pagination.total })}
+              </span>
             </p>
           </div>
         </div>
         <Button asChild className="bg-gradient-brand text-white shadow-brand hover:opacity-90">
           <Link href="/admin/organizations/new">
             <Plus className="mr-2 h-4 w-4" />
-            Agregar Organización
+            {t('add')}
           </Link>
         </Button>
       </div>
@@ -76,7 +80,7 @@ export default async function OrganizationsPage({
                 type="search"
                 name="search"
                 defaultValue={search}
-                placeholder="Buscar organizaciones..."
+                placeholder={t('searchPlaceholder')}
                 className="h-10 w-full rounded-xl border border-neutral-200 bg-neutral-50/50 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 transition-all focus:border-primary-highlight focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-highlight/10"
               />
             </form>
@@ -84,10 +88,10 @@ export default async function OrganizationsPage({
 
           <div className="hidden items-center gap-2 lg:flex">
             {[
-              { value: '', label: 'Todas', count: statusCounts.all },
-              { value: 'active', label: 'Activas', count: statusCounts.active },
-              { value: 'pending', label: 'Pendientes', count: statusCounts.pending },
-              { value: 'suspended', label: 'Suspendidas', count: statusCounts.suspended },
+              { value: '', label: t('all'), count: statusCounts.all },
+              { value: 'active', label: t('activePlural'), count: statusCounts.active },
+              { value: 'pending', label: t('pendingPlural'), count: statusCounts.pending },
+              { value: 'suspended', label: t('suspendedPlural'), count: statusCounts.suspended },
             ].map((option) => {
               // Build URL preserving search param
               const params = new URLSearchParams();
@@ -124,7 +128,7 @@ export default async function OrganizationsPage({
 
         <Button variant="outline" className="gap-2 lg:hidden">
           <Filter className="h-4 w-4" />
-          Filtrar
+          {t('filter')}
         </Button>
       </div>
 

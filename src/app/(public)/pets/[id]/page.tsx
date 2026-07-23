@@ -14,12 +14,14 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { getPet, getRandomPets } from '@/app/actions/pets';
 import { PublicFooter, PublicHeader } from '@/components/public';
 import { Button } from '@/components/ui/button';
-import { calculatePetAge, getSexLabel, getSizeLabel, getSpeciesLabel } from '@/lib/pets';
+import { getPetAge } from '@/lib/pets';
 
 export default async function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const [common, t] = await Promise.all([getTranslations('Common'), getTranslations('PetDetail')]);
   const { id } = await params;
   const pet = await getPet(id);
 
@@ -30,13 +32,32 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
   const similarPets = await getRandomPets(4, { species: pet.species });
   const filteredSimilarPets = similarPets.filter((p) => p.id !== pet.id).slice(0, 3);
 
-  const petAge = calculatePetAge(pet.birthDate);
+  const formatAge = (birthDate: Date | string | null | undefined) => {
+    const age = getPetAge(birthDate);
+    if (!age) return common('pet.unknownAge');
+    return age.unit === 'month'
+      ? common('pet.month', { count: age.count })
+      : common('pet.year', { count: age.count });
+  };
+  const petAge = formatAge(pet.birthDate);
+  const speciesLabel = pet.species === 'dog' ? common('pet.dog') : common('pet.cat');
+  const sizeLabels = {
+    small: common('pet.small'),
+    medium: common('pet.medium'),
+    large: common('pet.large'),
+    extra_large: common('pet.extraLarge'),
+  };
+  const sexLabels = {
+    male: common('pet.male'),
+    female: common('pet.female'),
+    unknown: common('pet.unknownSex'),
+  };
 
   const infoCards = [
-    { icon: Calendar, label: 'Edad', value: petAge },
-    { icon: Ruler, label: 'Tamaño', value: getSizeLabel(pet.size) },
-    { icon: User, label: 'Sexo', value: getSexLabel(pet.sex) },
-    { icon: MapPin, label: 'Ubicación', value: pet.cityName },
+    { icon: Calendar, label: t('age'), value: petAge },
+    { icon: Ruler, label: t('size'), value: sizeLabels[pet.size] },
+    { icon: User, label: t('sex'), value: sexLabels[pet.sex] },
+    { icon: MapPin, label: t('location'), value: pet.cityName },
   ];
 
   return (
@@ -49,7 +70,7 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
           className="inline-flex items-center gap-2 text-sm text-neutral-400 transition-colors hover:text-white"
         >
           <ArrowLeft className="h-4 w-4" />
-          Volver a peludos
+          {t('back')}
         </Link>
       </div>
 
@@ -75,7 +96,7 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
                     ) : (
                       <Cat className="h-4 w-4" />
                     )}
-                    {getSpeciesLabel(pet.species)}
+                    {speciesLabel}
                   </span>
                 </div>
 
@@ -105,7 +126,7 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
                   >
                     <Image
                       src={pet.image}
-                      alt={`${pet.name} - foto ${i}`}
+                      alt={t('photoAlt', { name: pet.name, number: i })}
                       fill
                       className="object-cover opacity-80"
                       unoptimized
@@ -129,7 +150,7 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
                     <PawPrint className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm text-neutral-500">En adopción con</p>
+                    <p className="text-sm text-neutral-500">{t('adoptionBy')}</p>
                     <p className="font-medium text-white">{pet.organizationName}</p>
                   </div>
                 </div>
@@ -149,12 +170,14 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
               </div>
 
               <div className="space-y-3">
-                <h2 className="text-lg font-semibold text-white">Sobre {pet.name}</h2>
+                <h2 className="text-lg font-semibold text-white">
+                  {t('about', { name: pet.name })}
+                </h2>
                 <p className="leading-relaxed text-neutral-400">{pet.description}</p>
               </div>
 
               <div className="space-y-3">
-                <h2 className="text-lg font-semibold text-white">Personalidad</h2>
+                <h2 className="text-lg font-semibold text-white">{t('personality')}</h2>
                 <div className="flex flex-wrap gap-2">
                   {pet.temperament.split(',').map((trait) => (
                     <span
@@ -170,7 +193,7 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-neutral-500">Color</p>
+                    <p className="text-neutral-500">{t('color')}</p>
                     <p className="font-medium text-white">{pet.color}</p>
                   </div>
                   <div>
@@ -188,7 +211,7 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
                 >
                   <Link href={`/user?action=adopt&petId=${pet.id}`}>
                     <Heart className="mr-2 h-5 w-5" />
-                    Quiero Adoptar
+                    {t('adopt')}
                   </Link>
                 </Button>
                 <Button
@@ -199,7 +222,7 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
                 >
                   <Link href={`/user?action=sponsor&petId=${pet.id}`}>
                     <Sparkles className="mr-2 h-5 w-5" />
-                    Apadrinar
+                    {t('sponsor')}
                   </Link>
                 </Button>
               </div>
@@ -207,12 +230,12 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
               <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-500">
                 <span className="flex items-center gap-1">
                   <div className="h-2 w-2 rounded-full bg-success" />
-                  Verificado
+                  {t('verified')}
                 </span>
                 <span>•</span>
-                <span>Vacunado</span>
+                <span>{t('vaccinated')}</span>
                 <span>•</span>
-                <span>Esterilizado</span>
+                <span>{t('sterilized')}</span>
               </div>
             </div>
           </div>
@@ -224,13 +247,13 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
           <div className="mx-auto max-w-7xl px-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-white">
-                Otros {pet.species === 'dog' ? 'perritos' : 'gatitos'} que te pueden gustar
+                {pet.species === 'dog' ? t('similarDogs') : t('similarCats')}
               </h2>
               <Link
                 href={`/pets?type=${pet.species}`}
                 className="text-sm font-medium text-primary-highlight hover:text-primary-highlight-light"
               >
-                Ver todos →
+                {t('viewAll')}
               </Link>
             </div>
 
@@ -253,7 +276,7 @@ export default async function PetDetailPage({ params }: { params: Promise<{ id: 
                     <div className="absolute bottom-3 left-3 right-3">
                       <h3 className="text-lg font-bold text-white">{similarPet.name}</h3>
                       <p className="text-sm text-neutral-300">
-                        {similarPet.breed} · {calculatePetAge(similarPet.birthDate)}
+                        {similarPet.breed} · {formatAge(similarPet.birthDate)}
                       </p>
                     </div>
                   </div>
