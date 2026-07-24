@@ -43,11 +43,19 @@ Replace the placeholders in `.env.local`, then apply migrations:
 pnpm db:migrate
 ```
 
-Optionally seed development data:
+Optionally create a compact role walkthrough:
 
 ```bash
-pnpm db:seed
+pnpm db:bootstrap
 ```
+
+The bootstrap creates or reuses one account for each application role, one active organization,
+its organization-admin membership, and six pets across representative lifecycle states. Set
+`BOOTSTRAP_OWNER_EMAIL` to a mailbox that supports plus addressing; the command derives `+admin`,
+`+org`, and `+user` aliases from it.
+
+Temporary passwords are generated with Node.js cryptography and are never stored or printed. Use
+the application's `/forgot-password` flow to choose a password for each account.
 
 Start the application:
 
@@ -73,10 +81,29 @@ equivalent.
 | `DATABASE_URL` | Server only | Yes | Drizzle runtime and migration connection. |
 | `NEXT_PUBLIC_SUPABASE_URL` | Browser and server | Yes | Supabase project URL. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser and server | Yes | Public Supabase client key; authorization still depends on policies. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server only | For user administration | Privileged Supabase Auth operations and Auth-aware seeds. |
+| `SUPABASE_SECRET_KEY` | Server only | For user administration | Current `sb_secret_...` key for privileged Auth operations and role bootstrap. |
+| `BOOTSTRAP_OWNER_EMAIL` | Server/CLI only | For `db:bootstrap` | Base mailbox used to derive the three role aliases. |
+| `BOOTSTRAP_ORGANIZATION_NAME` | Server/CLI only | No | Initial organization name; defaults to `Refugio Esperanza`. |
+| `BOOTSTRAP_ORGANIZATION_SLUG` | Server/CLI only | No | Initial organization slug; defaults to `refugio-esperanza`. |
 
 Use a direct database URL for migrations. A deployment may use a transaction-pooler-compatible
 URL for application traffic; keep the distinction explicit in deployment configuration.
+
+### Role bootstrap
+
+`pnpm db:bootstrap` is intended for the first application walkthrough, not for generating bulk
+sample data. It is safe to rerun when its Auth and database records remain consistent. It stops
+instead of repairing or overwriting partial accounts, changed roles, inactive organizations, or
+conflicting pet records.
+
+The resulting walkthrough is:
+
+- `+admin`: platform administration, users, and organizations;
+- `+org`: organization dashboard and membership for the configured organization;
+- `+user`: regular user dashboard and public pet discovery.
+
+If database provisioning fails after new Auth accounts are created, the command removes only
+those newly created Auth accounts. Existing accounts are never deleted.
 
 ### Supabase Auth configuration
 
@@ -99,7 +126,7 @@ development.
 | `pnpm db:check` | Validate Drizzle migration history. |
 | `pnpm db:generate` | Generate a migration from schema changes. |
 | `pnpm db:migrate` | Apply committed migrations. |
-| `pnpm db:seed` | Seed development data. |
+| `pnpm db:bootstrap` | Create the compact, idempotent role walkthrough. |
 | `pnpm db:studio` | Open Drizzle Studio. |
 
 `db:push` is reserved for local experimentation. Shared environments use committed migrations.

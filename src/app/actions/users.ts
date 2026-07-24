@@ -20,11 +20,11 @@ export interface UserFilters {
 
 // Admin Supabase client for user management
 function getAdminClient() {
-  if (!serverEnv.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for user administration');
+  if (!serverEnv.SUPABASE_SECRET_KEY) {
+    throw new Error('SUPABASE_SECRET_KEY is required for user administration');
   }
 
-  return createClient(clientEnv.NEXT_PUBLIC_SUPABASE_URL, serverEnv.SUPABASE_SERVICE_ROLE_KEY, {
+  return createClient(clientEnv.NEXT_PUBLIC_SUPABASE_URL, serverEnv.SUPABASE_SECRET_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
