@@ -28,6 +28,7 @@ function LoginForm() {
   const redirectUrl = searchParams.get('redirect');
   const action = searchParams.get('action');
   const petId = searchParams.get('petId');
+  const passwordReset = searchParams.get('passwordReset');
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -144,6 +145,11 @@ function LoginForm() {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
+            {passwordReset === 'success' && (
+              <output className="block rounded-xl border border-success/20 bg-success-light p-4 text-sm text-success-dark">
+                {t('passwordResetSuccess')}
+              </output>
+            )}
             {error && (
               <div className="rounded-xl bg-error-light border border-error/20 p-4 text-sm text-error">
                 {error}
