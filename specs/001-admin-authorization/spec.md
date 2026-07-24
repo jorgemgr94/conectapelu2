@@ -6,8 +6,6 @@
 
 **Status**: Planned
 
-**Roadmap ID**: SEC-01
-
 **Input**: Only an active application administrator may render `/admin`; establish the first
 shared server-only identity and role primitives without expanding into action authorization or
 tenant policy.
@@ -58,7 +56,8 @@ As a non-administrator or inactive identity, I cannot render the admin area even
 As a maintainer, I can reuse tested server-only `requireUser()` and `requireAppAdmin()` primitives
 so later action hardening does not repeat session and database-user resolution.
 
-**Why this priority**: SEC-02 and SEC-03 depend on a consistent identity and role contract.
+**Why this priority**: Later action-authorization features depend on a consistent identity and
+role contract.
 
 **Independent Test**: Unit tests exercise the primitives without rendering the layout, and the
 layout delegates to `requireAppAdmin()` rather than querying Auth and Drizzle itself.
@@ -95,8 +94,8 @@ layout delegates to `requireAppAdmin()` rather than querying Auth and Drizzle it
   organization administrator, and application administrator cases.
 - **FR-010**: Redirect destinations MUST be explicit, internal, and incapable of creating an admin
   redirect loop.
-- **FR-011**: The change MUST NOT authorize User or Organization actions; those remain SEC-02 and
-  SEC-03.
+- **FR-011**: The change MUST NOT authorize User or Organization actions; those require separate
+  future feature specifications.
 - **FR-012**: The change MUST NOT introduce organization membership policy or modify database
   schema, migrations, environment variables, or UI design.
 
@@ -123,4 +122,4 @@ layout delegates to `requireAppAdmin()` rather than querying Auth and Drizzle it
   organization-specific destination selection remains separate.
 - Redirects improve navigation but are not the underlying authorization proof.
 - Database role and status are authoritative for application access.
-- Action-level admin authorization follows in SEC-02 and SEC-03.
+- Action-level admin authorization follows in separate future feature specifications.

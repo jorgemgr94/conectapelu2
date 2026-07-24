@@ -109,7 +109,7 @@ development.
 - [Contribution guide](CONTRIBUTING.md)
 - [Project constitution](.specify/memory/constitution.md)
 - [Project foundation](specs/000-project-foundation/spec.md)
-- [Delivery roadmap](specs/000-project-foundation/roadmap.md)
+- [Spec Kit features](specs/)
 - [Specifications](specs/)
 
 ## Pull requests

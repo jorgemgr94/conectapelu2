@@ -14,11 +14,11 @@ Consequently, an active or inactive `user` or `organization_admin` with a databa
 the admin shell by requesting `/admin` directly.
 
 The same session/database-user lookup is repeated in organization and user layouts. Those layouts
-have different domain policy and are not part of SEC-01, but the duplication supports extracting
+have different domain policy and are not part of this feature, but the duplication supports extracting
 the identity primitive now.
 
 `src/app/actions/auth.ts` computes post-login destinations and currently catches unexpected errors
-by returning `/admin/dashboard`. SEC-01 must not depend on this fallback because an authorization
+by returning `/admin/dashboard`. This feature must not depend on this fallback because an authorization
 redirect could loop back to the protected route. Correcting the broader login-routing contract is
 independent work unless implementation proves it blocks the bounded helper.
 
@@ -26,7 +26,8 @@ independent work unless implementation proves it blocks the bounded helper.
 
 ### Use a server-only helper rather than layout-local checks
 
-The layout is only one caller. SEC-02 and SEC-03 will need the same proof inside exported actions.
+The layout is only one caller. Future action features will need the same proof inside exported
+actions.
 A shared helper prevents later code from treating a layout check as sufficient authorization.
 
 ### Resolve Auth first, application policy second
@@ -47,7 +48,7 @@ value narrow reduces accidental leakage and discourages provider-specific policy
 
 Next.js `redirect()` terminates control flow and matches the existing route behavior. Typed
 authorization errors may be appropriate for server actions later, but introducing both redirect
-and action-result adapters in SEC-01 would mix route authorization with SEC-02.
+and action-result adapters here would mix route authorization with later action authorization.
 
 ### Use `/user` as the safe non-admin destination
 
@@ -82,4 +83,4 @@ second authorization implementation.
 ### Include User and Organization actions in this change
 
 Rejected because those concerns have distinct callers, validation, service-role risk, and test
-surfaces. They remain SEC-02 and SEC-03.
+surfaces. They remain outside this feature and require their own specifications.

@@ -3,7 +3,7 @@
 **Branch**: `001-admin-authorization` | **Date**: 2026-07-24 |
 **Spec**: [spec.md](spec.md)
 
-**Input**: SEC-01 from the project roadmap.
+**Input**: Enforce authorization for the administrative route.
 
 ## Summary
 
@@ -40,7 +40,8 @@ authorization, and no UI redesign.
 - **Server-Boundary Security**: Pass. The role/status proof moves to a reusable server boundary.
 - **Explicit Data Ownership**: Pass. Supabase proves identity; Drizzle remains role/status truth.
 - **Server-First Delivery**: Pass. Authorization executes on the server with no client state.
-- **Specification-Driven Change**: Pass. SEC-01 is isolated from action and tenant hardening.
+- **Specification-Driven Change**: Pass. Route authorization is isolated from action and tenant
+  hardening.
 
 ## Project Structure
 

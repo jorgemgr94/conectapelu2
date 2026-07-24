@@ -9,8 +9,7 @@ core artifacts and one executable next feature.
 
 Initialize Spec Kit 0.14.1 with its native Codex integration, establish the repository
 constitution, migrate current-state evidence into `research.md`, preserve the target technical
-direction in this plan, move the dependency-aware portfolio into `roadmap.md`, and create SEC-01
-as the first independently executable feature package.
+direction in this plan, and create the first independently executable feature package.
 
 ## Technical Context
 
@@ -35,13 +34,13 @@ portable workflow.
 **Constraints**: One framework, no duplicate state, no fabricated historical specs, no product
 behavior changes, and no community extension trust boundary.
 
-**Scale/Scope**: One constitution, one foundation spec, one portfolio roadmap, and one complete
-next-feature package.
+**Scale/Scope**: One constitution, one foundation feature package, and one complete next-feature
+package.
 
 ## Constitution Check
 
 - **One Deployable Monolith**: Pass. No application architecture or deployment boundary changes.
-- **Server-Boundary Security**: Pass. SEC-01 makes the first authorization gap executable.
+- **Server-Boundary Security**: Pass. The first authorization gap is now an executable feature.
 - **Explicit Data Ownership**: Pass. The target direction retains Drizzle/Supabase boundaries.
 - **Server-First, Localized Delivery**: Pass. No UI or copy changes.
 - **Specification-Driven Change**: Pass. This adoption creates the required source of truth and
@@ -167,7 +166,6 @@ specs/
 │   ├── spec.md
 │   ├── research.md
 │   ├── plan.md
-│   ├── roadmap.md
 │   └── tasks.md
 └── 001-admin-authorization/
     ├── spec.md
@@ -177,8 +175,8 @@ specs/
     └── tasks.md
 ```
 
-`000-project-foundation` is the spec-of-specs portfolio. Subsequent directories are bounded
-delivery units and normally map to one pull request.
+Each numbered directory is an independent Spec Kit feature package. Spec Kit does not define a
+parent/child relationship between feature directories.
 
 ## Complexity Tracking
 

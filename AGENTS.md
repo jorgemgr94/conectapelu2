@@ -7,8 +7,7 @@
 - Treat `package.json` scripts, `.env.example`, and `src/db/schema/` as the current executable sources of truth.
 - Read [.specify/memory/constitution.md](.specify/memory/constitution.md) before planning or
   implementing a material change.
-- Use [specs/000-project-foundation/roadmap.md](specs/000-project-foundation/roadmap.md) to select
-  dependency-ready work.
+- Use the Spec Kit core workflow to create or select one numbered feature directory under `specs/`.
 - Treat the selected feature's `spec.md`, `plan.md`, and `tasks.md` as the source of truth for
   requirements, implementation decisions, and progress.
 - Do not add parallel planning systems such as `activeContext.md`, `progress.md`, Memory Bank,
@@ -22,7 +21,7 @@
 - `src/env/`: validated client and server environment variables.
 - `src/lib/supabase/`: Supabase browser and server clients.
 - `docs/`: durable, shared documentation only.
-- `specs/`: Spec Kit foundation, roadmap, feature specifications, plans, and tasks.
+- `specs/`: Spec Kit feature specifications, plans, research, and tasks.
 - `.specify/`: pinned Spec Kit configuration, constitution, templates, scripts, and workflow.
 - `.agents/skills/`: generated Spec Kit skills for the Codex integration.
 - `.github/`: CI, issue forms, ownership, and pull request conventions.
@@ -43,8 +42,7 @@
 
 For material product, architecture, security, database, or operational changes:
 
-1. Select one dependency-ready roadmap item.
-2. Create or refine its numbered feature directory with the Spec Kit core workflow.
+1. Create or select one numbered feature directory with the Spec Kit core workflow.
 3. Resolve meaningful ambiguity before implementation.
 4. Complete the Constitution Check in `plan.md`.
 5. Implement only the selected feature's `tasks.md`.

@@ -224,8 +224,9 @@ and post-deployment smoke checks need written and exercised procedures.
 
 ## Superseded material
 
-The previous local, Git-ignored `project-analysis.md` contained a detailed historical roadmap
-numbered PR-01 through PR-13. It was superseded on 2026-07-23 by stable domain IDs such as SEC-01
+The previous local, Git-ignored `project-analysis.md` contained detailed historical planning
+numbered PR-01 through PR-13. That planning was superseded on 2026-07-23 by the Spec Kit feature
+artifacts
 and CRUD-01. Its durable findings, decisions, outcomes, dependencies, and completed PR references
 were migrated into the foundation artifacts. The obsolete line-by-line task prose was deliberately
 not recreated because doing so would imply active planning artifacts that did not exist when the

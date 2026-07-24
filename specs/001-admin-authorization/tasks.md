@@ -50,8 +50,8 @@
 
 ## Deferred work
 
-- SEC-02: User administration action authorization.
-- SEC-03: Organization administration action authorization.
+- User administration action authorization in a future feature specification.
+- Organization administration action authorization in a future feature specification.
 - TENANT-01: organization membership roles and app-admin override.
 - Role-aware organization landing-page selection.
 - Typed action errors for non-route authorization callers.

@@ -39,5 +39,5 @@ passwords, tokens, or production data.
 
 ## Completion evidence
 
-Record the exact automated commands and manual scenarios actually performed in the SEC-01 pull
+Record the exact automated commands and manual scenarios actually performed in the feature pull
 request. Do not mark unavailable manual scenarios as completed.
