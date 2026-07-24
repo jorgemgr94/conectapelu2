@@ -17,7 +17,7 @@ env:
   DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/conectapelu2_test
   NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
   NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon-key
-  SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key
+  SUPABASE_SECRET_KEY: ci-secret-key
 
 jobs:
   quality:
