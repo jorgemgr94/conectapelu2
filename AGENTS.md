@@ -5,7 +5,13 @@
 - Read [README.md](README.md) for setup and the product overview.
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before changing code or preparing a pull request.
 - Treat `package.json` scripts, `.env.example`, and `src/db/schema/` as the current executable sources of truth.
-- Use GitHub issues and pull requests for active work; do not add `activeContext.md` or `progress.md` files.
+- Read [.specify/memory/constitution.md](.specify/memory/constitution.md) before planning or
+  implementing a material change.
+- Use the Spec Kit core workflow to create or select one numbered feature directory under `specs/`.
+- Treat the selected feature's `spec.md`, `plan.md`, and `tasks.md` as the source of truth for
+  requirements, implementation decisions, and progress.
+- Do not add parallel planning systems such as `activeContext.md`, `progress.md`, Memory Bank,
+  Backlog.md, or an external issue board.
 
 ## Repository map
 
@@ -15,6 +21,9 @@
 - `src/env/`: validated client and server environment variables.
 - `src/lib/supabase/`: Supabase browser and server clients.
 - `docs/`: durable, shared documentation only.
+- `specs/`: Spec Kit feature specifications, plans, research, and tasks.
+- `.specify/`: pinned Spec Kit configuration, constitution, templates, scripts, and workflow.
+- `.agents/skills/`: generated Spec Kit skills for the Codex integration.
 - `.github/`: CI, issue forms, ownership, and pull request conventions.
 
 ## Architecture constraints
@@ -30,6 +39,17 @@
 - Prefer status or archive behavior for business records unless the domain explicitly permits deletion.
 
 ## Development workflow
+
+For material product, architecture, security, database, or operational changes:
+
+1. Create or select one numbered feature directory with the Spec Kit core workflow.
+3. Resolve meaningful ambiguity before implementation.
+4. Complete the Constitution Check in `plan.md`.
+5. Implement only the selected feature's `tasks.md`.
+6. Run convergence and the checks relevant to the change before opening a pull request.
+
+GitHub Issues are not required for project state. Pull requests remain the review and delivery
+boundary. Community Spec Kit presets and extensions require explicit review before adoption.
 
 Use Node 24 and the package-manager version declared in `package.json`:
 
@@ -65,6 +85,7 @@ Run `pnpm db:migrate` against a disposable database when a migration changes. Ne
 ## Pull requests
 
 - Use Conventional Commits for commits and PR titles.
+- Link the feature directory in the PR description.
 - Keep each PR focused on one independently reviewable outcome.
 - Do not mix templates, workflows, environment changes, mechanical formatting, refactors, and product behavior when they can be reviewed separately.
 - Include tests and documentation required to explain and validate the changed behavior.
