@@ -107,6 +107,10 @@ development.
 ## Documentation
 
 - [Contribution guide](CONTRIBUTING.md)
+- [Project constitution](.specify/memory/constitution.md)
+- [Project foundation](specs/000-project-foundation/spec.md)
+- [Delivery roadmap](specs/000-project-foundation/roadmap.md)
+- [Specifications](specs/)
 
 ## Pull requests
 

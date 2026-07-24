@@ -45,6 +45,28 @@ Examples:
 Automated agents may prefix their branch with `agent/` while retaining a meaningful conventional
 description.
 
+## Specification-driven changes
+
+Material product, architecture, security, database, and operational changes use the pinned Spec
+Kit workflow:
+
+```bash
+uvx --from specify-cli==0.14.1 specify version
+```
+
+1. Select a dependency-ready entry from
+   [`specs/000-project-foundation/roadmap.md`](specs/000-project-foundation/roadmap.md).
+2. Refine its numbered feature `spec.md` and resolve meaningful ambiguity.
+3. Record implementation research and decisions in `research.md` and `plan.md`.
+4. Generate or refine dependency-ordered `tasks.md`.
+5. Run the full clarify, checklist, analyze, and converge gates when risk or ambiguity warrants
+   them.
+6. Implement one feature directory per focused pull request.
+
+The roadmap and feature artifacts are the project-state source of truth. GitHub Issues are not
+required. Pull requests remain the review and delivery record. Do not introduce a second backlog,
+progress file, memory bank, or external project board without replacing this workflow explicitly.
+
 ## Conventional Commits
 
 Commit messages and pull request titles use:
