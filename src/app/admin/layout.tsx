@@ -1,26 +1,16 @@
-import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { AdminShell } from '@/components/admin';
-import { db } from '@/db';
-import { usersTable } from '@/db/schema';
-import { createClient } from '@/lib/supabase/server';
+import { AuthorizationError } from '@/lib/auth/authorization';
+import { requireAppAdmin } from '@/lib/auth/server';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
+  const user = await requireAppAdmin().catch((error: unknown) => {
+    if (!(error instanceof AuthorizationError)) {
+      throw error;
+    }
 
-  if (!authUser) {
-    redirect('/login');
-  }
-
-  const dbUser = await db.query.usersTable.findFirst({
-    where: eq(usersTable.id, authUser.id),
+    redirect(error.code === 'FORBIDDEN' ? '/user' : '/login');
   });
-  if (!dbUser) {
-    redirect('/login');
-  }
 
-  return <AdminShell user={dbUser}>{children}</AdminShell>;
+  return <AdminShell user={user}>{children}</AdminShell>;
 }
